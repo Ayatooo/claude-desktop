@@ -21,6 +21,7 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 |---|---|
 | `/wallpaper ocean` | Aquarium (default): shark, distant whale, turtle, manta ray, a blue tang and a clownfish that come to look and leave, a school of fish, an angelfish, a rising jellyfish, a crab on the sand; reefs, kelp, light rays, bubbles. |
 | `/wallpaper lake` | A mountain lake that follows the time of day: an illustrated landscape (not ASCII) whose light moves on continuously from night to dawn, day and dusk. The sun and moon follow their real course (sunrise and sunset computed for the date and place, the moon in its real phase), with stars at night, mist at dawn, birds by day, reflections and glitter on the water. The interface palette changes with the moment of the day. |
+| `/wallpaper coast` | A coast with a lighthouse that follows the time of day, more detailed still: a fishing village on a hillside whose windows light up in waves at dusk and go out late at night, a church, a stone quay with street lamps and their reflections, moored boats rocking, layered cliffs with surf at their foot, a grassy headland with gorse and a path, the lighthouse and its beam sweeping the night, waves rolling in perspective, a sailboat and gulls by day, a dune with grass, flowers and a fence. The sun sets into the sea. |
 | `/wallpaper forest` | Forest at night: moon behind the trunks, mist, fireflies, an owl on its branch (blinks, turns its head); a fox, a deer that stops to graze then looks up, a rabbit that sits, a hedgehog, bats across the moon. |
 | `/wallpaper cabin` | Winter cabin: northern lights, mountains, snowy firs, a log cabin with warm windows, chimney smoke, snow on three layers; an arctic fox, a hare, a snowy owl in flight, an elk on the ridge. |
 | `/wallpaper abyss` | The deep sea: bioluminescence, a hydrothermal vent and its plume, glass sponges; giant squid, anglerfish with a glowing lure, dumbo octopus, rainbow comb jelly, lanternfish, gulper eel. |
@@ -40,7 +41,7 @@ What a theme changes:
 - **The backdrop** (desktop and mobile) and the glass over it (blur, tint, opacity).
 - **The interface palette** (desktop and mobile).
 - **The thinking indicator** (desktop and terminal; the mobile app does not draw it): themed words and a small glyph. On the desktop, when the row describes the current step ("Creating notes.md"), it keeps its words and only takes the glyph.
-- **The end-of-turn sound**: bubble, water drop, owl hoot, bell, sonar or kalimba. It only plays where Claude Code runs on a Mac (the engine plays it with `afplay`); a cloud or Linux session plays nothing.
+- **The end-of-turn sound**: bubble, water drop, wave wash, owl hoot, bell, sonar or kalimba. It only plays where Claude Code runs on a Mac (the engine plays it with `afplay`); a cloud or Linux session plays nothing.
 
 The texts a person reads (command replies, indicator words, labels) are in French; the code is in English.
 
@@ -51,6 +52,8 @@ The texts a person reads (command replies, indicator words, labels) are in Frenc
 - `hooks/ascii.ts`: the ASCII renderer. A vector shape becomes a grid of characters: 4×4 samples per cell, the inside shaded with a density ramp (`.:-=+*#%`) by the light, edges picked from the edge's direction (`/ \ _ - ( ) | ' .`), patterns, stamps (eyes, gills). Cells that do not change between frames are written once.
 - `hooks/stage.ts`: the toolkit every scene shares: renders models to SVG, CSS animations, and the choreography. `lane` plays a queue of passes (`cross` with an optional stop, `visit` with a U-turn, `rise`, `fall`, `walk`) and spreads the idle time; two lanes means two creatures at most.
 - A scene is two files: `<scene>-models.ts` (creatures and scenery as vector shapes) and `<scene>.ts` (the staging): `ocean`, `forest`, `cabin`, `abyss`, `desert`.
+- `hooks/daylight.ts`: what the scenes that follow the time share: local time in a time zone, sunrise and sunset (NOAA's simplified formulas), the moon's phase, keyframes over 24 hours that step once a minute.
+- `hooks/coast.ts`: the coast, built the same way as the lake.
 - `hooks/lake.ts`: the lake, painted rather than geometric: SVG filters give the rock its relief (fractal noise lit from the side, laid as a soft shadow), the clouds their ragged edges and the reflection its wobble; detailed pines, reeds, rocks, a dock and a rocking boat, fish rings, fireflies and the Milky Way at night. One SVG on a 24-hour CSS cycle, drawn at each render with a negative delay equal to the local time of day; its keyframes come from the day's sunrise and sunset (NOAA's simplified formulas) and the moon from its phase. A timer re-applies the palette when the moment of the day changes.
 - `hooks/simple-scenes.ts`: the three simple backdrops.
 - `hooks/generated-scenes.ts`: the detailed scenes, prebuilt (**generated**: the mod loads them without computing anything). After changing a scene, its models, `ascii.ts` or `stage.ts`, run:

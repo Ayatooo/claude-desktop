@@ -57,3 +57,19 @@ test('the lake backdrop is drawn on the 24-hour cycle, in sync with the time', a
   expect(source.length < 131072).toBe(true)
   await ui.unmount()
 })
+
+test('the coast backdrop is drawn on the 24-hour cycle and fits a backdrop', async ($, on) => {
+  on('store.get', () => ({ value: undefined }))
+  const ui = await $.ui.mount({
+    plugin: 'wallpaper',
+    component: 'Backdrop',
+    requestId: 'backdrop',
+    surface: 'mobile',
+    props: { scene: 'coast', plugin: 'wallpaper', glass: { blur: 12, opacity: 0.72 } },
+  })
+  const svg = await ui.find({ type: 'Svg' })
+  const source = String((svg?.props as { source?: string } | undefined)?.source ?? '')
+  expect(source.includes('86400s linear -')).toBe(true)
+  expect(source.length < 131072).toBe(true)
+  await ui.unmount()
+})

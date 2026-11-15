@@ -7,8 +7,10 @@
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
 import { ABYSS_SVG, CABIN_SVG, DESERT_SVG, FOREST_SVG, OCEAN_SVG } from './generated-scenes'
-import { dayPhase, lakeSvg } from './lake'
-import type { DayPhase, Place } from './lake'
+import { coastSvg } from './coast'
+import { dayPhase } from './daylight'
+import type { DayPhase, Place } from './daylight'
+import { lakeSvg } from './lake'
 import { makeColors } from './make-colors.js'
 import { SIMPLE_SCENES } from './simple-scenes'
 import type { Scene } from './simple-scenes'
@@ -266,7 +268,50 @@ export const THEMES: Theme[] = [...DETAILED, ...SIMPLE_SCENES].map(scene => {
   }
 })
 
-THEMES.splice(1, 0, LAKE)
+// The coast follows the day the same way, with its own palettes.
+const COAST_PALETTES: Record<DayPhase, Palette> = {
+  night: {
+    label: 'Côte de nuit',
+    roles: { accent: '#ffcf7a', danger: '#ef6b73', success: '#5fd3a2', warning: '#e9b056', pro: '#a99cff' },
+    anchors: { 'surface-0': '#060a18', 'surface-1': '#0b1122', 'surface-2': '#10172b', 'surface-3': '#141c33', 'text-primary': '#eaeffb', 'text-secondary': '#c3cbe2', 'text-muted': '#9aa5c2' },
+  },
+  dawn: {
+    label: "Côte à l'aube",
+    roles: { accent: '#f2a3b4', danger: '#f0707a', success: '#6fd3a6', warning: '#f0b65c', pro: '#b99cff' },
+    anchors: { 'surface-0': '#191326', 'surface-1': '#20182f', 'surface-2': '#261d37', 'surface-3': '#2c223f', 'text-primary': '#f6ecf2', 'text-secondary': '#d9c6d3', 'text-muted': '#b8a3b3' },
+  },
+  day: {
+    label: 'Côte en plein jour',
+    roles: { accent: '#3f9be8', danger: '#ef6b73', success: '#5fd3a2', warning: '#e9b056', pro: '#a99cff' },
+    anchors: { 'surface-0': '#0b1726', 'surface-1': '#101f31', 'surface-2': '#15263a', 'surface-3': '#1a2d43', 'text-primary': '#eef5fb', 'text-secondary': '#c3d3e2', 'text-muted': '#9cb1c6' },
+  },
+  dusk: {
+    label: 'Côte au crépuscule',
+    roles: { accent: '#f59a52', danger: '#f0707a', success: '#6fd3a6', warning: '#f0c060', pro: '#b99cff' },
+    anchors: { 'surface-0': '#1a1020', 'surface-1': '#22152a', 'surface-2': '#291a33', 'surface-3': '#301f3b', 'text-primary': '#fbeee8', 'text-secondary': '#e0c8c0', 'text-muted': '#c0a49c' },
+  },
+}
+
+const COAST_LOOKS = Object.fromEntries(
+  (Object.keys(COAST_PALETTES) as DayPhase[]).map(phase => [phase, { key: phase, ...colorsOf(COAST_PALETTES[phase]), glass: LAKE_GLASS[phase] }]),
+) as Record<DayPhase, Look>
+
+const COAST: Theme = {
+  id: 'coast',
+  label: 'Côte et phare',
+  alt: "Une côte avec un phare qui suit l'heure du jour : village de pêcheurs dont les fenêtres s'allument le soir, port, barques, falaises, vagues, voilier, mouettes, faisceau du phare la nuit",
+  svg: '',
+  render: coastSvg,
+  lookAt: (ms, place) => COAST_LOOKS[dayPhase(ms, place)],
+  ...COAST_LOOKS.day,
+  spinner: {
+    words: ['Guette le phare', 'Compte les vagues', 'Suit les mouettes', 'Répare les filets', 'Attend la marée', 'Regarde passer le voilier', "Allume les fenêtres du port"],
+    suffix: ' ≈',
+  },
+  sound: 'sounds/coast.wav',
+}
+
+THEMES.splice(1, 0, LAKE, COAST)
 
 export const themeById = (id: unknown): Theme | undefined => THEMES.find(t => t.id === id)
 

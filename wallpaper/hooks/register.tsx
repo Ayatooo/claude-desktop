@@ -1,7 +1,7 @@
 import type { EngineInterface, Register, ThemeSetArgs } from 'claude-code'
 
-import { DEFAULT_PLACE } from './lake'
-import type { Place } from './lake'
+import { DEFAULT_PLACE } from './daylight'
+import type { Place } from './daylight'
 import { DEFAULT_THEME, THEMES, lookOf, themeById } from './themes'
 import type { Theme } from './themes'
 
