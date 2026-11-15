@@ -41,3 +41,19 @@ test('wallpaper off: the engine keeps its own indicator', async ($, on) => {
   expect((await ui.find({ type: 'Text' }))?.text).toBe('Sauteing…')
   await ui.unmount()
 })
+
+test('the lake backdrop is drawn on the 24-hour cycle, in sync with the time', async ($, on) => {
+  on('store.get', () => ({ value: undefined }))
+  const ui = await $.ui.mount({
+    plugin: 'wallpaper',
+    component: 'Backdrop',
+    requestId: 'backdrop',
+    surface: 'desktop',
+    props: { scene: 'lake', plugin: 'wallpaper', glass: { blur: 12, opacity: 0.72 } },
+  })
+  const svg = await ui.find({ type: 'Svg' })
+  const source = String((svg?.props as { source?: string } | undefined)?.source ?? '')
+  expect(source.includes('86400s linear -')).toBe(true)
+  expect(source.length < 131072).toBe(true)
+  await ui.unmount()
+})

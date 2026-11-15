@@ -7,6 +7,8 @@
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
 import { ABYSS_SVG, CABIN_SVG, DESERT_SVG, FOREST_SVG, OCEAN_SVG } from './generated-scenes'
+import { dayPhase, lakeSvg } from './lake'
+import type { DayPhase, Place } from './lake'
 import { makeColors } from './make-colors.js'
 import { SIMPLE_SCENES } from './simple-scenes'
 import type { Scene } from './simple-scenes'
@@ -25,11 +27,18 @@ type Palette = {
   }
 }
 
+// What a theme looks like at one moment: its palette and glass.
+export type Look = { key: string; colors: ThemeColors; problems: string[]; glass: ThemeBackdropGlass }
+
 export type Theme = {
   id: string
   label: string
   alt: string
   svg: string
+  // A backdrop drawn for the moment (the lake follows the time of day).
+  render?: (ms: number, place: Place) => string
+  // A look that changes over time (the lake's palette follows the day).
+  lookAt?: (ms: number, place: Place) => Look
   colors: ThemeColors
   // The contrast lines Desktop would refuse the palette for (empty when fine).
   problems: string[]
@@ -173,6 +182,61 @@ const SPECS: Record<string, Spec> = {
   },
 }
 
+const LAKE_PALETTES: Record<DayPhase, Palette> = {
+  night: {
+    label: 'Lac de nuit',
+    roles: { accent: '#8fa8ff', danger: '#ef6b73', success: '#5fd3a2', warning: '#e9b056', pro: '#c58cff' },
+    anchors: { 'surface-0': '#070b1d', 'surface-1': '#0c1226', 'surface-2': '#11182f', 'surface-3': '#151d37', 'text-primary': '#eaeffd', 'text-secondary': '#c3cbe4', 'text-muted': '#9aa5c4' },
+  },
+  dawn: {
+    label: "Lac à l'aube",
+    roles: { accent: '#f2a3b4', danger: '#f0707a', success: '#6fd3a6', warning: '#f0b65c', pro: '#b99cff' },
+    anchors: { 'surface-0': '#1a1325', 'surface-1': '#21182e', 'surface-2': '#271d36', 'surface-3': '#2d223e', 'text-primary': '#f6ecf2', 'text-secondary': '#d9c6d3', 'text-muted': '#b8a3b3' },
+  },
+  day: {
+    label: 'Lac en plein jour',
+    roles: { accent: '#5aa9f0', danger: '#ef6b73', success: '#5fd3a2', warning: '#e9b056', pro: '#a99cff' },
+    anchors: { 'surface-0': '#0c1826', 'surface-1': '#112031', 'surface-2': '#16273a', 'surface-3': '#1b2e43', 'text-primary': '#eef5fb', 'text-secondary': '#c3d3e2', 'text-muted': '#9cb1c6' },
+  },
+  dusk: {
+    label: 'Lac au crépuscule',
+    roles: { accent: '#f39a5d', danger: '#f0707a', success: '#6fd3a6', warning: '#f0c060', pro: '#b99cff' },
+    anchors: { 'surface-0': '#1a1020', 'surface-1': '#22152a', 'surface-2': '#291a33', 'surface-3': '#301f3b', 'text-primary': '#fbeee8', 'text-secondary': '#e0c8c0', 'text-muted': '#c0a49c' },
+  },
+}
+
+// The bright day sky needs a denser glass behind the text.
+const LAKE_GLASS: Record<DayPhase, ThemeBackdropGlass> = {
+  night: { blur: 8, tint: '#070b1d', opacity: 0.55 },
+  dawn: { blur: 10, tint: '#1a1325', opacity: 0.62 },
+  day: { blur: 12, tint: '#0c1826', opacity: 0.72 },
+  dusk: { blur: 10, tint: '#1a1020', opacity: 0.62 },
+}
+
+function colorsOf(p: Palette): { colors: ThemeColors; problems: string[] } {
+  const { theme, problems } = makeColors({ label: p.label, only: 'dark', roles: p.roles, dark: { gray: { anchors: p.anchors } } })
+  return { colors: theme, problems: problems.filter(line => line.startsWith("Desktop won't paint")) }
+}
+
+const LAKE_LOOKS = Object.fromEntries(
+  (Object.keys(LAKE_PALETTES) as DayPhase[]).map(phase => [phase, { key: phase, ...colorsOf(LAKE_PALETTES[phase]), glass: LAKE_GLASS[phase] }]),
+) as Record<DayPhase, Look>
+
+const LAKE: Theme = {
+  id: 'lake',
+  label: 'Lac de montagne',
+  alt: "Un lac de montagne qui suit l'heure du jour : la lumière, le soleil, la lune, les étoiles, la brume et les couleurs changent de l'aube à la nuit",
+  svg: '',
+  render: lakeSvg,
+  lookAt: (ms, place) => LAKE_LOOKS[dayPhase(ms, place)],
+  ...LAKE_LOOKS.day,
+  spinner: {
+    words: ['Regarde le lac', 'Suit la course du soleil', 'Compte les nuages', 'Fait des ricochets', 'Écoute le vent dans les pins', 'Attend que la brume se lève'],
+    suffix: ' ~',
+  },
+  sound: 'sounds/lake.wav',
+}
+
 export const DEFAULT_THEME = 'ocean'
 
 // The detailed ASCII scenes, built by tools/build-scenes.mjs.
@@ -202,4 +266,10 @@ export const THEMES: Theme[] = [...DETAILED, ...SIMPLE_SCENES].map(scene => {
   }
 })
 
+THEMES.splice(1, 0, LAKE)
+
 export const themeById = (id: unknown): Theme | undefined => THEMES.find(t => t.id === id)
+
+// The look of a theme now: its own, or the one of the moment.
+export const lookOf = (t: Theme, ms: number, place: Place): Look =>
+  t.lookAt?.(ms, place) ?? { key: t.id, colors: t.colors, problems: t.problems, glass: t.glass }
