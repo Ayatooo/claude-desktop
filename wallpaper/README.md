@@ -20,6 +20,7 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 | Command | Scene |
 |---|---|
 | `/wallpaper ocean` | Aquarium (default): shark, distant whale, turtle, manta ray, a blue tang and a clownfish that come to look and leave, a school of fish, an angelfish, a rising jellyfish, a crab on the sand; reefs, kelp, light rays, bubbles. |
+| `/wallpaper lake-photo` | A realistic mountain lake, with its waterfall and rocks: four pictures of the same lake (dawn, day, dusk, night) shown as a still backdrop that changes with the moment of the day, each with an interface palette drawn from its colors. |
 | `/wallpaper lake` | A mountain lake that follows the time of day: an illustrated landscape (not ASCII) whose light moves on continuously from night to dawn, day and dusk. The sun and moon follow their real course (sunrise and sunset computed for the date and place, the moon in its real phase), with stars at night, mist at dawn, birds by day, reflections and glitter on the water. The interface palette changes with the moment of the day. |
 | `/wallpaper coast` | A coast with a lighthouse that follows the time of day, more detailed still: a fishing village on a hillside whose windows light up in waves at dusk and go out late at night, a church, a stone quay with street lamps and their reflections, moored boats rocking, layered cliffs with surf at their foot, a grassy headland with gorse and a path, the lighthouse and its beam sweeping the night, waves rolling in perspective, a sailboat and gulls by day, a dune with grass, flowers and a fence. The sun sets into the sea. |
 | `/wallpaper forest` | Forest at night: moon behind the trunks, mist, fireflies, an owl on its branch (blinks, turns its head); a fox, a deer that stops to graze then looks up, a rabbit that sits, a hedgehog, bats across the moon. |
@@ -62,6 +63,7 @@ The texts a person reads (command replies, indicator words, labels) are in Frenc
   node --experimental-strip-types tools/build-scenes.mjs forest   # one scene
   ```
   The script refuses a scene over 131,072 characters, the limit for a backdrop. Today: ocean ~101,000, forest ~111,000, cabin ~91,000, abyss ~83,000, desert ~118,000.
+- `photos/`: the realistic lake's four pictures (2560 px, under the 1 MiB a still backdrop allows). They were generated with Canva's AI image generator (the same lake, then the same scene at dawn, dusk and night), exported at full size from a Canva design and recompressed.
 - `sounds/`: the end-of-turn sounds, synthesized.
 - `tests/wallpaper.test.tsx`: thinking indicator tests (`claude plugin test wallpaper`).
 

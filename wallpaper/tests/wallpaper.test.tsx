@@ -73,3 +73,17 @@ test('the coast backdrop is drawn on the 24-hour cycle and fits a backdrop', asy
   expect(source.length < 131072).toBe(true)
   await ui.unmount()
 })
+
+test('the realistic lake sets a still picture of the moment as backdrop', async ($, on) => {
+  let sent: unknown
+  on('store.get', () => ({ value: 'lake-photo' }))
+  on('command.register', () => ({ value: { command: 'wallpaper' } }))
+  on('theme.set', (_, e) => {
+    sent = e
+    return { value: { isDrawn: true, requestId: 'theme' } }
+  })
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const source = (sent as { backdrop?: { image?: { source?: string } } } | undefined)?.backdrop?.image?.source ?? ''
+  expect(/^photos\/lake-(dawn|day|dusk|night)\.jpg$/.test(source)).toBe(true)
+})

@@ -312,7 +312,51 @@ const COAST: Theme = {
   sound: 'sounds/coast.wav',
 }
 
-THEMES.splice(1, 0, LAKE, COAST)
+// The realistic lake: four pictures of the same lake (dawn, day, dusk, night),
+// shown as a still backdrop that changes with the moment of the day, each
+// with a palette drawn from its colors.
+const PHOTO_PALETTES: Record<DayPhase, Palette> = {
+  dawn: {
+    label: "Lac réel à l'aube",
+    roles: { accent: '#e8a98f', danger: '#f0707a', success: '#6fd3a6', warning: '#f0b65c', pro: '#b99cff' },
+    anchors: { 'surface-0': '#141110', 'surface-1': '#1b1715', 'surface-2': '#211c1a', 'surface-3': '#272120', 'text-primary': '#f5ece8', 'text-secondary': '#d8c8c2', 'text-muted': '#b3a39c' },
+  },
+  day: {
+    label: 'Lac réel en plein jour',
+    roles: { accent: '#5a9fd8', danger: '#ef6b73', success: '#5fd3a2', warning: '#e9b056', pro: '#a99cff' },
+    anchors: { 'surface-0': '#0b141c', 'surface-1': '#101b25', 'surface-2': '#15222e', 'surface-3': '#1a2836', 'text-primary': '#eef4fa', 'text-secondary': '#c3d2e0', 'text-muted': '#9db0c3' },
+  },
+  dusk: {
+    label: 'Lac réel au crépuscule',
+    roles: { accent: '#e09068', danger: '#f0707a', success: '#6fd3a6', warning: '#f0c060', pro: '#b99cff' },
+    anchors: { 'surface-0': '#151211', 'surface-1': '#1c1716', 'surface-2': '#231c1b', 'surface-3': '#2a2120', 'text-primary': '#f8ede6', 'text-secondary': '#ddc8bd', 'text-muted': '#bba297' },
+  },
+  night: {
+    label: 'Lac réel la nuit',
+    roles: { accent: '#6f9cff', danger: '#ef6b73', success: '#5fd3a2', warning: '#e9b056', pro: '#a99cff' },
+    anchors: { 'surface-0': '#030a16', 'surface-1': '#07101f', 'surface-2': '#0b1628', 'surface-3': '#101c31', 'text-primary': '#e8eefb', 'text-secondary': '#bfcae2', 'text-muted': '#97a5c3' },
+  },
+}
+
+const PHOTO_LOOKS = Object.fromEntries(
+  (Object.keys(PHOTO_PALETTES) as DayPhase[]).map(phase => [
+    phase,
+    { key: phase, ...colorsOf(PHOTO_PALETTES[phase]), glass: LAKE_GLASS[phase], backdrop: { image: { source: `photos/lake-${phase}.jpg` } } },
+  ]),
+) as Record<DayPhase, Look>
+
+const LAKE_PHOTO: Theme = {
+  id: 'lake-photo',
+  label: 'Lac de montagne (réaliste)',
+  alt: "Un lac de montagne réaliste, avec sa cascade et ses rochers, qui change selon l'heure : aube, jour, crépuscule et nuit",
+  svg: '',
+  lookAt: (ms, place) => PHOTO_LOOKS[dayPhase(ms, place)],
+  ...PHOTO_LOOKS.day,
+  spinner: LAKE.spinner,
+  sound: 'sounds/lake.wav',
+}
+
+THEMES.splice(1, 0, LAKE_PHOTO, LAKE, COAST)
 
 export const themeById = (id: unknown): Theme | undefined => THEMES.find(t => t.id === id)
 
