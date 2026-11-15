@@ -4,7 +4,7 @@
 // Ids and code are English; labels, alt texts and indicator words are what a
 // person reads, in French.
 
-import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
+import type { ThemeBackdrop, ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
 import { ABYSS_SVG, CABIN_SVG, DESERT_SVG, FOREST_SVG, OCEAN_SVG } from './generated-scenes'
 import { coastSvg } from './coast'
@@ -29,8 +29,9 @@ type Palette = {
   }
 }
 
-// What a theme looks like at one moment: its palette and glass.
-export type Look = { key: string; colors: ThemeColors; problems: string[]; glass: ThemeBackdropGlass }
+// What a theme looks like at one moment: its palette and glass, and, for a
+// theme that shows a picture rather than an animated scene, its backdrop.
+export type Look = { key: string; colors: ThemeColors; problems: string[]; glass: ThemeBackdropGlass; backdrop?: ThemeBackdrop }
 
 export type Theme = {
   id: string

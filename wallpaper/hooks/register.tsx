@@ -25,7 +25,7 @@ async function apply($: EngineInterface, t: Theme) {
   const args: ThemeSetArgs = {
     colors: l.colors,
     overrideColorScheme: 'dark',
-    backdrop: { scene: t.id, glass: l.glass },
+    backdrop: l.backdrop ?? { scene: t.id, glass: l.glass },
   }
   const set = await $.theme.set(args)
   appliedLook = `${t.id}:${l.key}`
