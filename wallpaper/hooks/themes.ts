@@ -6,7 +6,7 @@
 
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
-import { AUTUMN_SVG, AUTUMN_THUMB, KOI_SVG, KOI_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
+import { AUTUMN_SVG, AUTUMN_THUMB, BLOOM_SVG, BLOOM_THUMB, KOI_SVG, KOI_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
 import { makeColors } from './make-colors.js'
 
 type Palette = {
@@ -122,6 +122,32 @@ const SPECS: Spec[] = [
       suffix: ' *',
     },
     sound: 'sounds/autumn.wav',
+  },
+  {
+    id: 'bloom',
+    label: 'Jardin de nuit',
+    alt: 'Un jardin de nuit en trame de points lumineux turquoise sur fond noir : croissant de lune, fleurs sur des tiges en pointillés qui ondulent, pollen et pétales qui flottent, lucioles, et parfois un papillon de nuit',
+    svg: BLOOM_SVG,
+    thumb: BLOOM_THUMB,
+    palette: {
+      label: 'Nuit',
+      roles: { accent: '#3fe0c8', danger: '#ff6b81', success: '#6ee7a8', warning: '#f5c15c', pro: '#a99cff' },
+      anchors: {
+        'surface-0': '#030607',
+        'surface-1': '#070d0f',
+        'surface-2': '#0b1416',
+        'surface-3': '#101b1e',
+        'text-primary': '#e2fbf6',
+        'text-secondary': '#a9d6cd',
+        'text-muted': '#7fb0a6',
+      },
+    },
+    glass: { blur: 4, tint: '#020506', opacity: 0.55 },
+    spinner: {
+      words: ['Fleurit dans le noir', 'Arrose les étoiles', 'Cueille la lune', 'Rêve en pointillés', 'Suit une luciole', 'Éclot doucement'],
+      suffix: ' .:',
+    },
+    sound: 'sounds/bloom.wav',
   },
 ]
 

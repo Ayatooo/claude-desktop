@@ -1,6 +1,6 @@
 # wallpaper
 
-A Claude Code mod that dresses up the Claude app (desktop and mobile): animated ASCII-art wallpapers (an aquarium, a koi pond, a cosy autumn night), a wallpaper picker with live thumbnails, a little Claude creature above the prompt, an interface palette to match, a themed thinking indicator and a quiet end-of-turn sound.
+A Claude Code mod that dresses up the Claude app (desktop and mobile): animated wallpapers (an ASCII aquarium, an ASCII koi pond, a cosy autumn night in cell art, a halftone night garden), a wallpaper picker with live thumbnails, a little Claude creature above the prompt, an interface palette to match, a themed thinking indicator and a quiet end-of-turn sound.
 
 ## Install
 
@@ -22,6 +22,10 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 
 `/wallpaper autumn`: a cosy Halloween evening in cell art, each character on its own coloured cell as a terminal paints (after the style of the `snow-pines` example theme). A harvest moon over dusky hills, a log cabin with warm flickering windows and chimney smoke, fall trees in orange, red and gold, a bare tree where an owl blinks, a fence, carved jack-o'-lanterns flickering, low fog, falling leaves. Now and then, never more than two at once: bats, a little ghost, a witch across the moon, a black cat along the fence, a fox. Its own palette (plum and pumpkin), indicator words ("Sculpte une citrouille", "Boit un chocolat chaud"…) and sound (an owl's hoot).
 
+## The night garden
+
+`/wallpaper bloom`: glowing flowers in halftone dots on a black night. Every shape is filled with a dot screen instead of a flat colour and glows: a crescent moon, faint twinkling stars, flowers on dotted stems swaying and slowly breathing, spikes and buds, dotted grass, pollen and petals drifting, fireflies; now and then a moth flutters across. Its own palette (near black, turquoise accent), indicator words ("Fleurit dans le noir", "Rêve en pointillés"…) and sound (three glassy notes).
+
 ## Commands
 
 | Command | What it does |
@@ -29,6 +33,7 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 | `/wallpaper ocean` | The aquarium. |
 | `/wallpaper koi` | The koi pond. |
 | `/wallpaper autumn` | The autumn night. |
+| `/wallpaper bloom` | The night garden. |
 | `/wallpaper off` | Back to the app's own look. |
 | `/wallpaper` | Opens (or closes) the picker above the prompt: an animated thumbnail per wallpaper, a click or its digit applies it, `0` for none. Sending a prompt closes it. |
 | `/wallpaper status` | Current state and settings. |
@@ -57,7 +62,8 @@ The texts a person reads are in French; the code is in English.
 - `hooks/ocean-models.ts` (the creatures and the reef as vector shapes) and `hooks/ocean.ts` (the staging).
 - `hooks/generated-scenes.ts`: the aquarium, prebuilt (**generated**: the mod loads it without computing anything). After changing a scene, its models, `ascii.ts` or `stage.ts`, run `node --experimental-strip-types tools/build-scenes.mjs`. The script refuses a scene over 131,072 characters, the limit for a backdrop (the aquarium is about 101,000, the pond and the autumn night about 115,000).
 - `hooks/cells.ts`: cell art, a grid of character cells with background colours, written as one path of rectangles per colour and one positioned `<text>` per glyph colour. `hooks/autumn-models.ts` (trees, cabin, pumpkins, moon, fence, the passers-by), `hooks/autumn.ts` (the scene) and `hooks/autumn-thumb.ts` (its thumbnail).
-- `sounds/ocean.wav`, `sounds/koi.wav`, `sounds/autumn.wav`: the end-of-turn sounds, synthesized.
+- `hooks/bloom.ts`: the night garden, pure vector shapes filled with dot patterns under a glow filter; its thumbnail is the same drawing cropped.
+- `sounds/*.wav`: the end-of-turn sounds, synthesized.
 - `tests/wallpaper.test.tsx`: tests (`claude plugin test wallpaper`).
 
 The terminal draws no backdrop, palette, thumbnails or creature: the desktop or mobile app is needed for those. There the picker is a row of buttons.
