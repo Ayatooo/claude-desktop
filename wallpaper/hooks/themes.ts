@@ -6,7 +6,7 @@
 
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
-import { OCEAN_SVG } from './generated-scenes'
+import { OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
 import { makeColors } from './make-colors.js'
 
 type Palette = {
@@ -28,6 +28,8 @@ export type Theme = {
   label: string
   alt: string
   svg: string
+  // A small animated preview for the picker (16:9).
+  thumb: string
   colors: ThemeColors
   // The contrast lines Desktop would refuse the palette for (empty when fine).
   problems: string[]
@@ -47,6 +49,7 @@ const SPECS: Spec[] = [
     label: 'Aquarium',
     alt: 'Un aquarium en art ASCII : requin, baleine, tortue, raie manta, poissons tropicaux, méduse et crabe parmi les récifs et les algues',
     svg: OCEAN_SVG,
+    thumb: OCEAN_THUMB,
     palette: {
       label: 'Océan',
       roles: { accent: '#3fc8d4', danger: '#ff6b6b', success: '#5ee6a8', warning: '#ffb454', pro: '#a08cff' },

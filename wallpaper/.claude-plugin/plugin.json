@@ -1,5 +1,6 @@
 {
   "name": "wallpaper",
-  "version": "0.2.0",
-  "description": "An animated ASCII-art aquarium as wallpaper for the Claude app, with a matching palette, thinking indicator and end-of-turn sound"
+  "version": "0.3.0",
+  "description": "An animated ASCII-art aquarium as wallpaper for the Claude app, with a wallpaper picker, a little Claude creature above the prompt, a matching palette, thinking indicator and end-of-turn sound",
+  "types": "./types/index.d.ts"
 }

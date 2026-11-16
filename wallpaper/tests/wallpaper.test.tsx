@@ -1,4 +1,5 @@
 import { expect, test } from 'claude-code/testing'
+import type { TestBody } from 'claude-code/testing'
 
 const SPINNER = {
   plugin: 'wallpaper',
@@ -8,7 +9,7 @@ const SPINNER = {
 } as const
 
 // Stands for the engine: draws the word and suffix it is handed.
-function engine(on: Parameters<Parameters<typeof test>[1]>[1]) {
+function engine(on: Parameters<TestBody>[1]) {
   on('ui.render', ($, e) => {
     const { Text } = $.ui.resolve(e)
     const p = e.props as { word: string; suffix: string }
@@ -56,4 +57,81 @@ test('motion on: the backdrop keeps moving even when the system asks for reduced
   expect(source.includes('<svg')).toBe(true)
   expect(source.includes('prefers-reduced-motion')).toBe(false)
   await ui.unmount()
+})
+
+const BAND = {
+  plugin: 'wallpaper',
+  component: 'AbovePrompt',
+  requestId: 'band',
+  props: {
+    hasSurvey: false,
+    isCollapsed: false,
+    isWorking: false,
+    maxRows: 30,
+    bodyColumns: 100,
+    scroll: { offset: 0, bodyRows: 29 },
+    view: {},
+  },
+} as const
+
+test('the creature lives above the prompt, and bounces while Claude works', async ($, on) => {
+  on('store.get', (_, e) => ({ value: (e as { key?: string }).key === 'scene' ? 'ocean' : undefined }))
+  for (const surface of ['desktop', 'mobile'] as const) {
+    const idle = await $.ui.mount({ ...BAND, surface })
+    const a = String(((await idle.find({ type: 'Svg' }))?.props as { source?: string }).source)
+    expect(a.includes('mPos')).toBe(true)
+    await idle.unmount()
+    const busy = await $.ui.mount({ ...BAND, surface, props: { ...BAND.props, isWorking: true } })
+    const b = String(((await busy.find({ type: 'Svg' }))?.props as { source?: string }).source)
+    expect(b.includes('mBounce')).toBe(true)
+    await busy.unmount()
+  }
+})
+
+test('pet off: the band is left to the engine', async ($, on) => {
+  on('store.get', (_, e) => ({ value: (e as { key?: string }).key === 'pet' ? 'off' : 'ocean' }))
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>engine</Text>
+  })
+  const ui = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('/wallpaper opens the picker; a pick applies the theme and closes it', async ($, on) => {
+  const stored: Record<string, unknown> = {}
+  on('store.get', (_, e) => ({ value: stored[(e as { key: string }).key] }))
+  on('store.set', (_, e) => {
+    const { key, value } = e as { key: string; value: unknown }
+    stored[key] = value
+    return { value: undefined }
+  })
+  let applied = 0
+  on('theme.set', () => {
+    applied += 1
+    return { value: { isDrawn: true, requestId: 't' } }
+  })
+  on('command.run', () => ({}))
+
+  await $.command.run({
+    command: 'wallpaper',
+    args: '',
+    origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 100 },
+  })
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({ ...BAND, surface })
+    expect(await ui.find({ key: 'pick-ocean' })).toBeDefined()
+    expect((await ui.find({ type: 'Svg' })) !== undefined).toBe(surface === 'desktop')
+    await ui.unmount()
+  }
+  const ui = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  await ui.press({ key: 'pick-ocean' })
+  expect(stored['scene']).toBe('ocean')
+  expect(applied).toBe(1)
+  await ui.unmount()
+  const after = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await after.find({ key: 'pick-ocean' })).toBeUndefined()
+  await after.unmount()
 })
