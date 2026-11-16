@@ -227,7 +227,7 @@ export const register: Register = on => {
     const table = $.ui.resolve(e)
     const { Box, Text, Button } = table
     // The terminal has no vector drawings: the picker is buttons alone there.
-    const Svg = 'Svg' in table ? table.Svg : undefined
+    const Svg = graphic && 'Svg' in table ? table.Svg : undefined
     const close = () => update($, isPickerOpen, () => false)
     const choose = async (picked: Theme | undefined) => {
       if (picked === undefined) {
