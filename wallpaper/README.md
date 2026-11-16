@@ -64,6 +64,10 @@ The texts a person reads are in French; the code is in English.
 - `hooks/cells.ts`: cell art, a grid of character cells with background colours, written as one path of rectangles per colour and one positioned `<text>` per glyph colour. `hooks/autumn-models.ts` (trees, cabin, pumpkins, moon, fence, the passers-by), `hooks/autumn.ts` (the scene) and `hooks/autumn-thumb.ts` (its thumbnail).
 - `hooks/bloom.ts`: the night garden, pure vector shapes filled with dot patterns under a glow filter; its thumbnail is the same drawing cropped.
 - `sounds/*.wav`: the end-of-turn sounds, synthesized.
+
+The app draws a backdrop to cover its slot. In a narrow slot (a split view's pane, a phone held upright) that crops a wide scene's sides and blows it up; so each scene keeps its far layers (water, sky, stars) filling the view and, through CSS media queries on the aspect ratio, shrinks the scene itself toward the bottom so its whole width shows. `tools/build-scenes.mjs` also refuses a scene with an unescaped `&`, which would break the XML the app loads.
+
+A split view's other pane is another session: it shows this wallpaper only if that session loads the mod (a cloud session does not load the plugins installed on your computer).
 - `tests/wallpaper.test.tsx`: tests (`claude plugin test wallpaper`).
 
 The terminal draws no backdrop, palette, thumbnails or creature: the desktop or mobile app is needed for those. There the picker is a row of buttons.

@@ -250,17 +250,15 @@ function build(): string {
 <filter id="murk"><feGaussianBlur stdDeviation=".9"/></filter>
 <filter id="shade" x="-20%" y="-30%" width="150%" height="170%"><feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dx="22" dy="30"/><feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="lift" x="-20%" y="-20%" width="150%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feOffset dx="8" dy="12"/><feComponentTransfer><feFuncA type="linear" slope=".5"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
+    back: [`<rect width="${W}" height="${H}" fill="url(#pond)"/>`, floor(), shimmer()],
+    front: [`<rect width="${W}" height="${H}" fill="url(#vignette)"/>`],
     layers: [
-      `<rect width="${W}" height="${H}" fill="url(#pond)"/>`,
-      floor(),
-      shimmer(),
       ...lane1,
       ...lane2.filter((_, i) => i !== 1),
       ...surface,
       petals(),
       ripples(),
       lane2[1]!,
-      `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`,
     ],
   })
 }

@@ -149,10 +149,8 @@ function build(view?: string): string {
 <mask id="crescent"><circle cx="170" cy="150" r="140" fill="#fff"/><circle cx="232" cy="118" r="108" fill="#000"/></mask>
 <radialGradient id="mist" cx=".8" cy=".85" r=".6"><stop offset="0" stop-color="#0f4a44" stop-opacity=".35"/><stop offset="1" stop-color="#0f4a44" stop-opacity="0"/></radialGradient>`,
     css: [`.stem{fill:none;stroke:${TEAL};stroke-width:2.4;stroke-linecap:round;stroke-dasharray:0 6;opacity:.75}`, `.gr path{fill:none;stroke:${DIM};stroke-width:2;stroke-linecap:round;stroke-dasharray:0 5}`],
+    back: [`<rect width="${W}" height="${H}" fill="#020405"/>`, `<rect width="${W}" height="${H}" fill="url(#mist)"/>`, `<g fill="${BRIGHT}" opacity=".7">${stars}</g>`],
     layers: [
-      `<rect width="${W}" height="${H}" fill="#020405"/>`,
-      `<rect width="${W}" height="${H}" fill="url(#mist)"/>`,
-      `<g fill="${BRIGHT}" opacity=".7">${stars}</g>`,
       moon,
       ...lane,
       `<g filter="url(#bloom)">${flowers.map(flowerSvg).join('')}</g>`,

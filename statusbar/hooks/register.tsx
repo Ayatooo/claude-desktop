@@ -155,7 +155,7 @@ export const register: Register = on => {
           {left}
         </Box>
         {quotas.length > 0 ? (
-          <Box flexDirection="row" flexWrap="wrap" alignItems="center" columnGap={3}>
+          <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={3}>
             {quotas}
           </Box>
         ) : (

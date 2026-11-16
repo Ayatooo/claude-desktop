@@ -239,12 +239,9 @@ function build(): string {
     60,
   )
 
+  // The water, its light and its snow fill the whole view.
+  const back = [waterField(), rays(), caustics(), marineSnow()]
   const layers = [
-    waterField(),
-    rays(),
-    caustics(),
-    marineSnow(),
-
     // Calm seabed: rocks and corals in the corners, a few kelp.
     kelpAt(330, 70, 3),
     place(reefL, 0, H - 22),
@@ -267,12 +264,9 @@ function build(): string {
 <filter id="soft" x="-20%" y="-5%" width="140%" height="110%"><feGaussianBlur stdDeviation="16"/></filter>
 <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="dof" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="0.7"/></filter>`,
-    layers: [
-      `<rect width="${W}" height="${H}" fill="url(#water)"/>`,
-      `<rect width="${W}" height="${H}" fill="url(#halo)"/>`,
-      ...layers,
-      `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`,
-    ],
+    back: [`<rect width="${W}" height="${H}" fill="url(#water)"/>`, `<rect width="${W}" height="${H}" fill="url(#halo)"/>`, ...back],
+    layers,
+    front: [`<rect width="${W}" height="${H}" fill="url(#vignette)"/>`],
   })
 }
 

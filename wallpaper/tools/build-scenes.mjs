@@ -48,6 +48,14 @@ for (const name of wanted) {
   }
   const t0 = Date.now()
   const svg = (await import(path.join(tmp, file)))[constant]
+  // The app loads a backdrop as an XML document: a bare & or a < in a text
+  // breaks the whole drawing.
+  const bad = svg.match(/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-f]+);)/i)
+  if (bad) {
+    console.error(`${name}: an unescaped & at ${bad.index}: …${svg.slice(Math.max(0, bad.index - 40), bad.index + 10)}…`)
+    failed = true
+    continue
+  }
   if (svg.length > LIMIT) {
     console.error(`${name}: too large, ${svg.length} characters (limit ${LIMIT}).`)
     failed = true

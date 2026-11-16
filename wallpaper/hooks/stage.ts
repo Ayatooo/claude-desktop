@@ -228,7 +228,28 @@ export function stage(opts: StageOptions) {
   }
 
   // The final SVG: the scene's gradients and filters, shared CSS, layers.
-  const finish = (args: { defs: string; layers: string[]; css?: string[] }): string => {
+  //
+  // `back` (water, sky, far light) and `front` (a vignette) fill the whole
+  // view. When given, the scene itself (`layers`) is fitted to narrow views:
+  // the backdrop is drawn to cover its slot (a split pane, a phone held
+  // upright), which crops a wide scene's sides and blows it up; there, the
+  // scene shrinks toward the bottom so its whole width shows, while `back`
+  // keeps filling the view above it.
+  const finish = (args: { defs: string; layers: string[]; css?: string[]; back?: string[]; front?: string[] }): string => {
+    const fitted = args.back !== undefined || args.front !== undefined
+    // Scale for the narrowest aspect of each step: the scene is never
+    // narrower than the view, so no gap opens at its sides.
+    const fit = fitted
+      ? [
+          `#fit{transform-origin:${W / 2}px ${H}px}`,
+          ...[
+            [1.3, 0.81],
+            [1.1, 0.69],
+            [0.9, 0.56],
+            [0.7, 0.44],
+          ].map(([a, k]) => `@media (max-aspect-ratio:${Math.round(a! * 10)}/10){#fit{transform:scale(${k})}}`),
+        ]
+      : []
     const all = [
       'text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono","Liberation Mono",monospace;white-space:pre}',
       '.fb{transform-box:fill-box;transform-origin:center}',
@@ -237,12 +258,14 @@ export function stage(opts: StageOptions) {
       '.pu{transform-box:fill-box;transform-origin:center top}',
       ...(args.css ?? []),
       ...css,
+      ...fit,
       '@media (prefers-reduced-motion:reduce){*{animation-play-state:paused!important}}',
     ]
+    const body = fitted ? [...(args.back ?? []), `<g id="fit">${args.layers.join('\n')}</g>`, ...(args.front ?? [])] : args.layers
     return `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">
 <defs>${args.defs}</defs>
 <style>${all.join('')}</style>
-${args.layers.join('\n')}
+${body.join('\n')}
 </svg>`
   }
 

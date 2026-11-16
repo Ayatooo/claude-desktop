@@ -13,7 +13,7 @@
 
 import { CELL_CSS, CH, CW, Grid, gridSvg } from './cells'
 import { GOLD, ORANGE, RED, WINDOW, bareTree, bat, cabin, cat, farTree, fence, fox, ghost, moon, owl, pumpkin, tree, witch } from './autumn-models'
-import { H, W, mix, n, rng, stage } from './stage'
+import { H, W, esc, mix, n, rng, stage } from './stage'
 import type { Drawn, Pass } from './stage'
 
 const st = stage({ cycle: 420, slow: 1 })
@@ -167,7 +167,7 @@ function build(): string {
   const leafTints = ['#e0782e', '#c8452a', '#e8b040', '#b8582a', '#f09a48']
   for (let i = 0; i < 34; i++) {
     const dur = 26 + r() * 30
-    leaves += `<g transform="translate(${Math.round(r() * W)},-30)"><text class="fb" fill="${leafTints[i % leafTints.length]}" font-size="${12 + Math.round(r() * 6)}" style="animation:lf${i % 3} ${n(dur)}s linear ${n(-r() * dur)}s infinite">${['*', ',', "'", '~', '%', 'v', '&'][i % 7]}</text></g>`
+    leaves += `<g transform="translate(${Math.round(r() * W)},-30)"><text class="fb" fill="${leafTints[i % leafTints.length]}" font-size="${12 + Math.round(r() * 6)}" style="animation:lf${i % 3} ${n(dur)}s linear ${n(-r() * dur)}s infinite">${esc(['*', ',', "'", '~', '%', 'v', '&'][i % 7]!)}</text></g>`
   }
 
   // Passers-by.
@@ -219,9 +219,8 @@ function build(): string {
 <radialGradient id="vignette" cx=".5" cy=".45" r=".8"><stop offset=".6" stop-color="#0c0612" stop-opacity="0"/><stop offset="1" stop-color="#0c0612" stop-opacity=".65"/></radialGradient>
 <filter id="haze" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="22"/></filter>`,
     css: [CELL_CSS],
+    back: [`<rect width="${W}" height="${H}" fill="url(#sky)"/>`, stars()],
     layers: [
-      `<rect width="${W}" height="${H}" fill="url(#sky)"/>`,
-      stars(),
       `<g style="animation:dusk 170s ease-in-out infinite alternate"><ellipse cx="900" cy="${HORIZON * CH}" rx="760" ry="220" fill="url(#dusk)"/></g>`,
       `<circle cx="${n(124.5 * CW)}" cy="${n(16.5 * CH)}" r="260" fill="url(#moonGlow)" style="animation:glow 9s ease-in-out infinite alternate"/>`,
       gridSvg(moonG),
@@ -242,8 +241,8 @@ function build(): string {
       `<g style="animation:candle 2.2s ease-in-out infinite">${gridSvg(faces)}</g>`,
       fog,
       `<g font-weight="700">${leaves}</g>`,
-      `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`,
     ],
+    front: [`<rect width="${W}" height="${H}" fill="url(#vignette)"/>`],
   })
 }
 
