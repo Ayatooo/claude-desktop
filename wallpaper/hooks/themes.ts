@@ -6,7 +6,7 @@
 
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
-import { KOI_SVG, KOI_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
+import { AUTUMN_SVG, AUTUMN_THUMB, KOI_SVG, KOI_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
 import { makeColors } from './make-colors.js'
 
 type Palette = {
@@ -96,6 +96,32 @@ const SPECS: Spec[] = [
       suffix: ' ~',
     },
     sound: 'sounds/koi.wav',
+  },
+  {
+    id: 'autumn',
+    label: "Nuit d'automne",
+    alt: "Une nuit d'automne douillette en art ASCII à cellules colorées : pleine lune orangée, cabane en rondins aux fenêtres chaudes et cheminée qui fume, arbres roux et dorés, arbre nu avec une chouette, citrouilles sculptées, brume et feuilles qui tombent ; passent des chauves-souris, un petit fantôme, une sorcière, un chat noir et un renard",
+    svg: AUTUMN_SVG,
+    thumb: AUTUMN_THUMB,
+    palette: {
+      label: 'Automne',
+      roles: { accent: '#f0923a', danger: '#ff6b6b', success: '#9ad48a', warning: '#f5c15c', pro: '#c3a3ff' },
+      anchors: {
+        'surface-0': '#140c1a',
+        'surface-1': '#1b1122',
+        'surface-2': '#22162a',
+        'surface-3': '#2a1b33',
+        'text-primary': '#f6e9e0',
+        'text-secondary': '#d8c3c4',
+        'text-muted': '#b39ea6',
+      },
+    },
+    glass: { blur: 5, tint: '#120a18', opacity: 0.6 },
+    spinner: {
+      words: ['Ramasse les feuilles', 'Sculpte une citrouille', 'Allume une bougie', 'Boit un chocolat chaud', 'Écoute la chouette', 'Rentre du bois'],
+      suffix: ' *',
+    },
+    sound: 'sounds/autumn.wav',
   },
 ]
 
