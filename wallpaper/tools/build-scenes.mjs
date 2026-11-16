@@ -14,6 +14,8 @@ import { fileURLToPath } from 'node:url'
 const SCENES = {
   ocean: ['ocean.ts', 'OCEAN_SVG'],
   'ocean-thumb': ['ocean-thumb.ts', 'OCEAN_THUMB'],
+  koi: ['koi.ts', 'KOI_SVG'],
+  'koi-thumb': ['koi-thumb.ts', 'KOI_THUMB'],
 }
 // The most characters a backdrop's SVG may hold.
 const LIMIT = 131072

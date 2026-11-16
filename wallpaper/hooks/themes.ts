@@ -6,7 +6,7 @@
 
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
-import { OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
+import { KOI_SVG, KOI_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
 import { makeColors } from './make-colors.js'
 
 type Palette = {
@@ -70,6 +70,32 @@ const SPECS: Spec[] = [
       suffix: ' o°',
     },
     sound: 'sounds/ocean.wav',
+  },
+  {
+    id: 'koi',
+    label: 'Bassin de koïs',
+    alt: "Un bassin de jardin japonais vu de dessus, en art ASCII : des carpes koïs kohaku, showa, yamabuki et asagi qui ondulent entre les nénuphars et les lotus, des pétales qui dérivent, des ronds dans l'eau et une libellule",
+    svg: KOI_SVG,
+    thumb: KOI_THUMB,
+    palette: {
+      label: 'Bassin',
+      roles: { accent: '#f08a5d', danger: '#ff6b6b', success: '#7fd99a', warning: '#f5c15c', pro: '#c3a3ff' },
+      anchors: {
+        'surface-0': '#07140f',
+        'surface-1': '#0b1d16',
+        'surface-2': '#10251d',
+        'surface-3': '#152d24',
+        'text-primary': '#eaf5ef',
+        'text-secondary': '#bfd8cb',
+        'text-muted': '#94b3a4',
+      },
+    },
+    glass: { blur: 5, tint: '#06150f', opacity: 0.6 },
+    spinner: {
+      words: ['Glisse sous les nénuphars', "Fait des ronds dans l'eau", 'Médite au bord du bassin', 'Suit une koï', 'Écoute la libellule', 'Ondule doucement'],
+      suffix: ' ~',
+    },
+    sound: 'sounds/koi.wav',
   },
 ]
 

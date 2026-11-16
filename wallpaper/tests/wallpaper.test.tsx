@@ -123,12 +123,13 @@ test('/wallpaper opens the picker; a pick applies the theme and closes it', asyn
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ ...BAND, surface })
     expect(await ui.find({ key: 'pick-ocean' })).toBeDefined()
+    expect(await ui.find({ key: 'pick-koi' })).toBeDefined()
     expect((await ui.find({ type: 'Svg' })) !== undefined).toBe(surface === 'desktop')
     await ui.unmount()
   }
   const ui = await $.ui.mount({ ...BAND, surface: 'desktop' })
-  await ui.press({ key: 'pick-ocean' })
-  expect(stored['scene']).toBe('ocean')
+  await ui.press({ key: 'pick-koi' })
+  expect(stored['scene']).toBe('koi')
   expect(applied).toBe(1)
   await ui.unmount()
   const after = await $.ui.mount({ ...BAND, surface: 'desktop' })
