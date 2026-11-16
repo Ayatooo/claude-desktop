@@ -184,7 +184,11 @@ function build(): string {
     return { svg: many, w: one.w + 140, h: one.h + 34 }
   })()
   const ghostD = sprite(ghost, 2, 1.8)
-  const witchD = sprite(witch, 2, 0.7)
+  // The witch, larger, so her silhouette reads against the moon.
+  const witchD = (() => {
+    const d = sprite(witch, 2, 0.7)
+    return { svg: `<g transform="scale(1.6)">${d.svg}</g>`, w: d.w * 1.6, h: d.h * 1.6 }
+  })()
   const catD = sprite(cat, 2, 0.9)
   const foxD = sprite(fox, 2, 0.5)
 
@@ -192,7 +196,7 @@ function build(): string {
     [
       { d: bats, kind: 'cross', from: 'left', y: 150, dur: 34, bob: 26, bobPeriod: 3 },
       { d: ghostD, opacity: 0.88, kind: 'cross', from: 'right', y: 330, dur: 64, bob: 30, bobPeriod: 5 },
-      { d: witchD, kind: 'cross', from: 'left', y: 120, dur: 30, bob: 14, bobPeriod: 4 },
+      { d: witchD, kind: 'cross', from: 'left', y: 16.5 * CH - witchD.h / 2, dur: 32, bob: 14, bobPeriod: 4 },
       { d: bats, kind: 'cross', from: 'right', y: 260, dur: 36, bob: 26, bobPeriod: 3 },
     ] satisfies Pass[],
     0,

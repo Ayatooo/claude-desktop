@@ -253,14 +253,15 @@ export function ghost(frame: number): Grid {
 // A witch on her broom, cape flapping (frames 0 and 1).
 export function witch(frame: number): Grid {
   const g = new Grid()
+  // Facing right: the cape and the broom's bristles trail behind her.
   const rows = [
-    '      ^        ',
-    '     XXX       ',
-    '    XXXXX      ',
-    '     Xf     ' + (frame === 0 ? 'CC ' : '   '),
-    '    XXXX' + (frame === 0 ? 'CCCC   ' : 'CC     '),
-    'BBBBBBBBBBBB///',
-    '        X  X \\\\\\',
+    '       ^       ',
+    '      XXX      ',
+    '     XXXXX     ',
+    frame === 0 ? 'CC    Xf       ' : '      Xf       ',
+    frame === 0 ? ' CCCCXXXX      ' : '   CCXXXX      ',
+    '///BBBBBBBBBBBB',
+    '\\\\\\   X  X     ',
   ]
   rows.forEach((row, y) =>
     [...row].forEach((ch, x) => {
