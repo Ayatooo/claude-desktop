@@ -1,11 +1,11 @@
 # statusbar
 
-A Claude Code mod: a quiet bar right above the prompt, in the style of TUFFUI's inline context meter.
+A Claude Code mod: a quiet two-line bar right above the prompt, in the style of TUFFUI's inline context meter.
 
-- **Left**: the project (the repository's folder) and its current git branch, `isiit / backlog`.
-- **Right**: three quotas, each a thin strip of 20 ticks, its percentage in tabular figures and, for the usage windows, when it resets: `ctx ▮▮▯▯… 9%`, `5h ▮▯▯… 6% ↻ 4h31`, `sem ▮▮▮▮▮▮▮▮▮▮▯… 49% ↻ 21h41`. The last fifth of each strip is tinted amber; past 80 % the quota turns amber, past 95 % red.
+- **First line**: the project (the repository's folder) and its current git branch, `isiit / backlog`.
+- **Second line**: three quotas, each a thin strip of 20 ticks, its percentage in tabular figures and, for the usage windows, when it resets: `ctx ▮▮▯▯… 9%`, `5h ▮▯▯… 6% ↻ 4h31`, `sem ▮▮▮▮▮▮▮▮▮▮▯… 49% ↻ 21h41`. The last fifth of each strip is tinted amber; past 80 % the quota turns amber, past 95 % red.
 
-The figures come from the engine itself (`$.session.usage()` and the `session.measure` event: the context window and the `five_hour` and `seven_day` windows); the branch from `git`, read at session start and after each turn. The countdowns move every minute. The bar puts itself last in the band, right above the prompt, below other mods' rows.
+The figures come from the engine itself (`$.session.usage()` and the `session.measure` event: the context window and the `five_hour` and `seven_day` windows); the branch from `git`, read at session start and after each turn. The countdowns move every minute. Each quota keeps its own width; when the band is narrow they wrap to another line rather than overlap. The bar puts itself last in the band, right above the prompt, below other mods' rows.
 
 On the desktop and mobile apps the strips are drawn as small vector images; the terminal gets them in characters.
 

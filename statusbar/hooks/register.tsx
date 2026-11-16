@@ -101,7 +101,7 @@ export const register: Register = on => {
         )
       }
       return (
-        <Box key={key} flexDirection="row" alignItems="center" gap={1}>
+        <Box key={key} flexDirection="row" alignItems="center" gap={1} flexShrink={0}>
           <Text mono size="footnote" dimColor>
             {label}
           </Text>
@@ -147,14 +147,22 @@ export const register: Register = on => {
       }
     }
 
+    // Two lines: project / branch, then the quotas (wrapping if the band is
+    // narrow, never squeezed into each other).
     return (
-      <Box flexDirection="row" justifyContent="space-between" alignItems="center" borderStyle="round" borderColor="promptBorder" paddingX={1} gap={2}>
+      <Box flexDirection="column" borderStyle="round" borderColor="promptBorder" paddingX={1}>
         <Box flexDirection="row" alignItems="center" gap={1}>
           {left}
         </Box>
-        <Box flexDirection="row" alignItems="center" gap={2}>
-          {quotas}
-        </Box>
+        {quotas.length > 0 ? (
+          <Box flexDirection="row" flexWrap="wrap" alignItems="center" columnGap={3}>
+            {quotas}
+          </Box>
+        ) : (
+          <Text mono size="footnote" dimColor>
+            quotas à la première réponse
+          </Text>
+        )}
       </Box>
     )
   })
