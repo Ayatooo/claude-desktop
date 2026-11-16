@@ -1,71 +1,44 @@
 # wallpaper
 
-A Claude Code mod that dresses up the Claude app (desktop and mobile): animated ASCII-art wallpapers, an interface palette matched to each scene, a themed thinking indicator and a quiet end-of-turn sound.
+A Claude Code mod that dresses up the Claude app (desktop and mobile): an animated ASCII-art aquarium as wallpaper, an interface palette to match, a themed thinking indicator and a quiet end-of-turn sound.
 
 ## Install
 
-At the prompt of a terminal session:
-
-```
-/plugin install wallpaper --marketplace ayatooo/claude-desktop
-```
-
-From a shell: `claude plugin install wallpaper --marketplace ayatooo/claude-desktop`.
 In the desktop app: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `ayatooo/claude-desktop`, then **Add plugin**.
+
+At the prompt of a terminal session: `/plugin install wallpaper --marketplace ayatooo/claude-desktop`. From a shell: `claude plugin install wallpaper --marketplace ayatooo/claude-desktop`.
 
 To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 
-## Themes
+## The aquarium
 
-| Command | Scene |
+`/wallpaper ocean` (the default): an aquarium drawn entirely in shaded ASCII art. As in a real aquarium, creatures pass by one at a time on two lanes, so never more than two on screen, slowly: a shark, a distant whale, a turtle, a manta ray, a blue tang and a clownfish that come to look and leave, a school of fish, an angelfish, a jellyfish rising, a crab on the sand; reefs, swaying kelp, light rays, marine snow and bubbles.
+
+| Command | What it does |
 |---|---|
-| `/wallpaper ocean` | Aquarium (default): shark, distant whale, turtle, manta ray, a blue tang and a clownfish that come to look and leave, a school of fish, an angelfish, a rising jellyfish, a crab on the sand; reefs, kelp, light rays, bubbles. |
-| `/wallpaper lake-photo` | A realistic mountain lake, with its waterfall and rocks: four pictures of the same lake (dawn, day, dusk, night) shown as a still backdrop that changes with the moment of the day, each with an interface palette drawn from its colors. |
-| `/wallpaper lake` | A mountain lake that follows the time of day: an illustrated landscape (not ASCII) whose light moves on continuously from night to dawn, day and dusk. The sun and moon follow their real course (sunrise and sunset computed for the date and place, the moon in its real phase), with stars at night, mist at dawn, birds by day, reflections and glitter on the water. The interface palette changes with the moment of the day. |
-| `/wallpaper coast` | A coast with a lighthouse that follows the time of day, more detailed still: a fishing village on a hillside whose windows light up in waves at dusk and go out late at night, a church, a stone quay with street lamps and their reflections, moored boats rocking, layered cliffs with surf at their foot, a grassy headland with gorse and a path, the lighthouse and its beam sweeping the night, waves rolling in perspective, a sailboat and gulls by day, a dune with grass, flowers and a fence. The sun sets into the sea. |
-| `/wallpaper forest` | Forest at night: moon behind the trunks, mist, fireflies, an owl on its branch (blinks, turns its head); a fox, a deer that stops to graze then looks up, a rabbit that sits, a hedgehog, bats across the moon. |
-| `/wallpaper cabin` | Winter cabin: northern lights, mountains, snowy firs, a log cabin with warm windows, chimney smoke, snow on three layers; an arctic fox, a hare, a snowy owl in flight, an elk on the ridge. |
-| `/wallpaper abyss` | The deep sea: bioluminescence, a hydrothermal vent and its plume, glass sponges; giant squid, anglerfish with a glowing lure, dumbo octopus, rainbow comb jelly, lanternfish, gulper eel. |
-| `/wallpaper desert` | Desert at night: Milky Way, crescent moon, shooting star, dunes, oasis, saguaros; a caravan on the ridge, a fennec fox, a glowing scorpion, a jerboa, a viper. |
-| `/wallpaper aurora`, `night`, `tide` | Three simpler backdrops, without creatures. |
+| `/wallpaper ocean` | The aquarium. |
 | `/wallpaper off` | Back to the app's own look. |
-| `/wallpaper` | Current theme, sound state, list of themes. |
-| `/wallpaper sound on` / `off` | End-of-turn sound. |
-| `/wallpaper motion on` / `auto` | `auto` (default): the backdrop freezes on a still frame when the system asks for reduced motion (on Windows: Settings > Accessibility > Visual effects > Animation effects off). `on`: it keeps moving anyway. |
-| `/wallpaper place <lat> <lon> [time zone]` | Where the lake's sun rises and sets, e.g. `/wallpaper place 45.76 4.84 Europe/Paris`. Default: Paris. |
+| `/wallpaper` | Current state and settings. |
+| `/wallpaper sound on` / `off` | End-of-turn sound (a bubble). It only plays where Claude Code runs on a Mac (the engine plays it with `afplay`). |
+| `/wallpaper motion on` / `auto` | `auto` (default): the aquarium freezes on a still frame when the system asks for reduced motion (on Windows: Settings > Accessibility > Visual effects > Animation effects off). `on`: it keeps moving anyway. |
 | `/wallpaper diag`, `/wallpaper test` | Display diagnostics: is the theme drawn? does a loud still gradient show? |
 
-The choice is kept across sessions. When the system asks for reduced motion, a scene freezes on a still frame, unless `/wallpaper motion on`.
+What the theme changes:
+- **The backdrop** (desktop and mobile) and the glass over it.
+- **The interface palette** (desktop and mobile), deep sea blue.
+- **The thinking indicator** (desktop and terminal; the mobile app does not draw it): sea words ("Nage avec les poissons", "Suit le courant"…) and a small `o°`. On the desktop, when the row describes the current step ("Creating notes.md"), it keeps its words and only takes the glyph.
 
-Every scene follows one rule: as in an aquarium, creatures pass by one at a time on two "lanes", so **never more than two on screen**. Everything is slow: a pass lasts one to several minutes, a full cycle about 6 to 8 minutes.
-
-What a theme changes:
-- **The backdrop** (desktop and mobile) and the glass over it (blur, tint, opacity).
-- **The interface palette** (desktop and mobile).
-- **The thinking indicator** (desktop and terminal; the mobile app does not draw it): themed words and a small glyph. On the desktop, when the row describes the current step ("Creating notes.md"), it keeps its words and only takes the glyph.
-- **The end-of-turn sound**: bubble, water drop, wave wash, owl hoot, bell, sonar or kalimba. It only plays where Claude Code runs on a Mac (the engine plays it with `afplay`); a cloud or Linux session plays nothing.
-
-The texts a person reads (command replies, indicator words, labels) are in French; the code is in English.
+The texts a person reads are in French; the code is in English.
 
 ## How it works
 
 - `hooks/register.tsx`: the `/wallpaper` command, the backdrop, the thinking indicator, the end-of-turn sound.
-- `hooks/themes.ts`: the theme registry (palette, glass, indicator words, sound). A new theme is a new entry here.
+- `hooks/themes.ts`: the theme registry (palette, glass, indicator words, sound).
 - `hooks/ascii.ts`: the ASCII renderer. A vector shape becomes a grid of characters: 4×4 samples per cell, the inside shaded with a density ramp (`.:-=+*#%`) by the light, edges picked from the edge's direction (`/ \ _ - ( ) | ' .`), patterns, stamps (eyes, gills). Cells that do not change between frames are written once.
-- `hooks/stage.ts`: the toolkit every scene shares: renders models to SVG, CSS animations, and the choreography. `lane` plays a queue of passes (`cross` with an optional stop, `visit` with a U-turn, `rise`, `fall`, `walk`) and spreads the idle time; two lanes means two creatures at most.
-- A scene is two files: `<scene>-models.ts` (creatures and scenery as vector shapes) and `<scene>.ts` (the staging): `ocean`, `forest`, `cabin`, `abyss`, `desert`.
-- `hooks/daylight.ts`: what the scenes that follow the time share: local time in a time zone, sunrise and sunset (NOAA's simplified formulas), the moon's phase, keyframes over 24 hours that step once a minute.
-- `hooks/coast.ts`: the coast, built the same way as the lake.
-- `hooks/lake.ts`: the lake, painted rather than geometric: SVG filters give the rock its relief (fractal noise lit from the side, laid as a soft shadow), the clouds their ragged edges and the reflection its wobble; detailed pines, reeds, rocks, a dock and a rocking boat, fish rings, fireflies and the Milky Way at night. One SVG on a 24-hour CSS cycle, drawn at each render with a negative delay equal to the local time of day; its keyframes come from the day's sunrise and sunset (NOAA's simplified formulas) and the moon from its phase. A timer re-applies the palette when the moment of the day changes.
-- `hooks/simple-scenes.ts`: the three simple backdrops.
-- `hooks/generated-scenes.ts`: the detailed scenes, prebuilt (**generated**: the mod loads them without computing anything). After changing a scene, its models, `ascii.ts` or `stage.ts`, run:
-  ```bash
-  node --experimental-strip-types tools/build-scenes.mjs          # every scene
-  node --experimental-strip-types tools/build-scenes.mjs forest   # one scene
-  ```
-  The script refuses a scene over 131,072 characters, the limit for a backdrop. Today: ocean ~101,000, forest ~111,000, cabin ~91,000, abyss ~83,000, desert ~118,000.
-- `photos/`: the realistic lake's four pictures (2560 px, under the 1 MiB a still backdrop allows). They were generated with Canva's AI image generator (the same lake, then the same scene at dawn, dusk and night), exported at full size from a Canva design and recompressed.
-- `sounds/`: the end-of-turn sounds, synthesized.
-- `tests/wallpaper.test.tsx`: thinking indicator tests (`claude plugin test wallpaper`).
+- `hooks/stage.ts`: renders models to SVG with CSS animations, and the choreography: `lane` plays a queue of passes (`cross` with an optional stop, `visit` with a U-turn, `rise`, `fall`, `walk`) and spreads the idle time; two lanes means two creatures at most.
+- `hooks/ocean-models.ts` (the creatures and the reef as vector shapes) and `hooks/ocean.ts` (the staging).
+- `hooks/generated-scenes.ts`: the aquarium, prebuilt (**generated**: the mod loads it without computing anything). After changing `ocean*.ts`, `ascii.ts` or `stage.ts`, run `node --experimental-strip-types tools/build-scenes.mjs`. The script refuses a scene over 131,072 characters, the limit for a backdrop (the aquarium is about 101,000).
+- `sounds/ocean.wav`: the end-of-turn sound, synthesized.
+- `tests/wallpaper.test.tsx`: tests (`claude plugin test wallpaper`).
 
-The terminal draws no backdrop or palette: the desktop or mobile app is needed for those. The themed thinking indicator also shows in the terminal.
+The terminal draws no backdrop or palette: the desktop or mobile app is needed for those.

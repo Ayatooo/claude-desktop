@@ -1,54 +1,29 @@
 import type { EngineInterface, Register, ThemeSetArgs } from 'claude-code'
 
-import { DEFAULT_PLACE } from './daylight'
-import type { Place } from './daylight'
-import { DEFAULT_THEME, THEMES, lookOf, themeById } from './themes'
+import { DEFAULT_THEME, THEMES, themeById } from './themes'
 import type { Theme } from './themes'
 
 const SCENE_KEY = 'scene'
 const SOUND_KEY = 'sound'
-const PLACE_KEY = 'place'
 const MOTION_KEY = 'motion'
 
 // The rule each scene carries to freeze when the system asks for reduced motion.
 const REDUCED_MOTION = /@media \(prefers-reduced-motion:reduce\)\{\*\{[^}]*\}\}/g
 
-// How often a theme whose look follows the time is checked.
-const LOOK_CHECK_MS = 5 * 60 * 1000
-
-async function placeOf($: EngineInterface): Promise<Place> {
-  const saved = (await $.store.get(PLACE_KEY)) as Partial<Place> | undefined
-  return { ...DEFAULT_PLACE, ...(saved ?? {}) }
-}
-
-// The key of the look last applied, to re-apply only when it changes.
-let appliedLook = ''
-
 async function apply($: EngineInterface, t: Theme) {
-  const l = lookOf(t, Date.now(), await placeOf($))
   const args: ThemeSetArgs = {
-    colors: l.colors,
+    colors: t.colors,
     overrideColorScheme: 'dark',
-    backdrop: l.backdrop ?? { scene: t.id, glass: l.glass },
+    backdrop: { scene: t.id, glass: t.glass },
   }
   const set = await $.theme.set(args)
-  appliedLook = `${t.id}:${l.key}`
   $.ui.status(set.isDrawn ? undefined : set.reason)
-  const unpainted = l.problems[0]
+  const unpainted = t.problems[0]
   if (unpainted !== undefined) {
     $.ui.toast(unpainted)
   }
 
   return set
-}
-
-function validTimeZone(tz: string): boolean {
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone: tz })
-    return true
-  } catch {
-    return false
-  }
 }
 
 // The chosen theme, or undefined when the wallpaper is turned off.
@@ -71,24 +46,13 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'wallpaper',
-      description: `Change le fond : /wallpaper ${THEMES.map(t => t.id).join(' | ')} | off · /wallpaper sound on|off · /wallpaper motion on|auto · /wallpaper place <lat> <lon> [fuseau]`,
+      description: `Change le fond : /wallpaper ${THEMES.map(t => t.id).join(' | ')} | off · /wallpaper sound on|off · /wallpaper motion on|auto`,
     })
 
     const t = await current($)
     if (t !== undefined) {
       await apply($, t)
     }
-
-    // A theme whose look follows the time (the lake) changes palette at dawn,
-    // day, dusk and night.
-    $.clock.every(LOOK_CHECK_MS, () => {
-      void (async () => {
-        const now = await current($)
-        if (now?.lookAt === undefined) return
-        const key = `${now.id}:${now.lookAt(Date.now(), await placeOf($)).key}`
-        if (key !== appliedLook) await apply($, now)
-      })()
-    })
 
     return next(e)
   })
@@ -130,18 +94,6 @@ export const register: Register = on => {
             ? 'Le fond reste animé même si le système demande de réduire les animations.'
             : 'Le fond suit le réglage du système : figé quand il demande de réduire les animations.',
       }
-    }
-    if (first === 'place') {
-      const [lat, lon, tz] = e.args.trim().split(/\s+/).slice(1)
-      const place: Place = { lat: Number(lat), lon: Number(lon), tz: tz ?? DEFAULT_PLACE.tz }
-      if (!Number.isFinite(place.lat) || !Number.isFinite(place.lon) || Math.abs(place.lat) > 90 || Math.abs(place.lon) > 180 || !validTimeZone(place.tz)) {
-        const p = await placeOf($)
-        return { text: `Lieu actuel : ${p.lat}, ${p.lon} (${p.tz}). Usage : /wallpaper place <latitude> <longitude> [fuseau IANA], par ex. /wallpaper place 45.76 4.84 Europe/Paris.` }
-      }
-      await $.store.set(PLACE_KEY, place)
-      const t = await current($)
-      if (t?.lookAt !== undefined) await apply($, t)
-      return { text: `Lieu enregistré : ${place.lat}, ${place.lon} (${place.tz}). Le lever et le coucher du soleil suivent ce lieu.` }
     }
     if (first === 'diag') {
       const t = (await current($)) ?? themeById(DEFAULT_THEME)!
@@ -191,7 +143,7 @@ export const register: Register = on => {
       return next(e)
     }
     const { Svg } = $.ui.resolve(e)
-    let source = t.render ? t.render(Date.now(), await placeOf($)) : t.svg
+    let source = t.svg
     // Asked to keep moving: drop the scene's reduced-motion rule.
     if ((await $.store.get(MOTION_KEY)) === 'on') source = source.replace(REDUCED_MOTION, '')
 

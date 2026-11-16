@@ -1,4 +1,4 @@
-// Builds the detailed scenes once and writes them to hooks/generated-scenes.ts,
+// Builds the ASCII scenes once and writes them to hooks/generated-scenes.ts,
 // which the mod loads as is (nothing is computed at startup).
 //
 //   node --experimental-strip-types tools/build-scenes.mjs [scene...]
@@ -13,10 +13,6 @@ import { fileURLToPath } from 'node:url'
 // Scene id → [module, exported constant].
 const SCENES = {
   ocean: ['ocean.ts', 'OCEAN_SVG'],
-  forest: ['forest.ts', 'FOREST_SVG'],
-  cabin: ['cabin.ts', 'CABIN_SVG'],
-  abyss: ['abyss.ts', 'ABYSS_SVG'],
-  desert: ['desert.ts', 'DESERT_SVG'],
 }
 // The most characters a backdrop's SVG may hold.
 const LIMIT = 131072

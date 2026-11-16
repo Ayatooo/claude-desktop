@@ -1,5 +1,5 @@
 {
   "name": "wallpaper",
   "version": "0.2.0",
-  "description": "Animated ASCII-art wallpapers for the Claude app (aquarium, forest, cabin, abyss, desert), with a matching palette, thinking indicator and end-of-turn sound"
+  "description": "An animated ASCII-art aquarium as wallpaper for the Claude app, with a matching palette, thinking indicator and end-of-turn sound"
 }
