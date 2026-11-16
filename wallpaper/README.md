@@ -31,10 +31,11 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 | `/wallpaper off` | Back to the app's own look. |
 | `/wallpaper` | Current theme, sound state, list of themes. |
 | `/wallpaper sound on` / `off` | End-of-turn sound. |
+| `/wallpaper motion on` / `auto` | `auto` (default): the backdrop freezes on a still frame when the system asks for reduced motion (on Windows: Settings > Accessibility > Visual effects > Animation effects off). `on`: it keeps moving anyway. |
 | `/wallpaper place <lat> <lon> [time zone]` | Where the lake's sun rises and sets, e.g. `/wallpaper place 45.76 4.84 Europe/Paris`. Default: Paris. |
 | `/wallpaper diag`, `/wallpaper test` | Display diagnostics: is the theme drawn? does a loud still gradient show? |
 
-The choice is kept across sessions. Animations stop when the system asks for reduced motion.
+The choice is kept across sessions. When the system asks for reduced motion, a scene freezes on a still frame, unless `/wallpaper motion on`.
 
 Every scene follows one rule: as in an aquarium, creatures pass by one at a time on two "lanes", so **never more than two on screen**. Everything is slow: a pass lasts one to several minutes, a full cycle about 6 to 8 minutes.
 

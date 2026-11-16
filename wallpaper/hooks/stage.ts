@@ -237,7 +237,7 @@ export function stage(opts: StageOptions) {
       '.pu{transform-box:fill-box;transform-origin:center top}',
       ...(args.css ?? []),
       ...css,
-      '@media (prefers-reduced-motion:reduce){*{animation:none!important}}',
+      '@media (prefers-reduced-motion:reduce){*{animation-play-state:paused!important}}',
     ]
     return `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">
 <defs>${args.defs}</defs>

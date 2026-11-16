@@ -28,7 +28,7 @@ const aurora = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" 
   .e:nth-child(2n){animation-duration:7s;animation-delay:-2s}
   .e:nth-child(3n){animation-duration:9s;animation-delay:-4s}
   @keyframes t{0%,100%{opacity:.25}50%{opacity:.9}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  @media (prefers-reduced-motion:reduce){*{animation-play-state:paused!important}}
 </style>
 <rect width="1600" height="1000" fill="url(#sky)"/>
 <g>
@@ -66,7 +66,7 @@ const night = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" p
   @keyframes f{0%,88%{opacity:0;transform:translate(0,0)}90%{opacity:1}96%{opacity:0;transform:translate(-520px,260px)}100%{opacity:0}}
   .moon{animation:p 9s ease-in-out infinite alternate}
   @keyframes p{to{opacity:.75}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  @media (prefers-reduced-motion:reduce){*{animation-play-state:paused!important}}
 </style>
 <rect width="1600" height="1000" fill="url(#glow)"/>
 <g class="sky">
@@ -96,7 +96,7 @@ const tide = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" pr
   @keyframes o{0%{transform:translateX(-120px)}100%{transform:translateX(60px)}}
   .r{animation:h 12s ease-in-out infinite alternate}
   @keyframes h{0%{transform:translateY(0)}100%{transform:translateY(-14px)}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  @media (prefers-reduced-motion:reduce){*{animation-play-state:paused!important}}
 </style>
 <rect width="1600" height="1000" fill="url(#sea)"/>
 <g class="r">

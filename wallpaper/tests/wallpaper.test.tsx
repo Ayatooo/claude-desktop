@@ -87,3 +87,19 @@ test('the realistic lake sets a still picture of the moment as backdrop', async 
   const source = (sent as { backdrop?: { image?: { source?: string } } } | undefined)?.backdrop?.image?.source ?? ''
   expect(/^photos\/lake-(dawn|day|dusk|night)\.jpg$/.test(source)).toBe(true)
 })
+
+test('motion on: the backdrop keeps moving even when the system asks for reduced motion', async ($, on) => {
+  on('store.get', (_, e) => ({ value: (e as { key?: string }).key === 'motion' ? 'on' : 'ocean' }))
+  const ui = await $.ui.mount({
+    plugin: 'wallpaper',
+    component: 'Backdrop',
+    requestId: 'backdrop',
+    surface: 'desktop',
+    props: { scene: 'ocean', plugin: 'wallpaper', glass: { blur: 5, opacity: 0.62 } },
+  })
+  const svg = await ui.find({ type: 'Svg' })
+  const source = String((svg?.props as { source?: string } | undefined)?.source ?? '')
+  expect(source.includes('<svg')).toBe(true)
+  expect(source.includes('prefers-reduced-motion')).toBe(false)
+  await ui.unmount()
+})

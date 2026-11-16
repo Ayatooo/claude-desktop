@@ -8,6 +8,10 @@ import type { Theme } from './themes'
 const SCENE_KEY = 'scene'
 const SOUND_KEY = 'sound'
 const PLACE_KEY = 'place'
+const MOTION_KEY = 'motion'
+
+// The rule each scene carries to freeze when the system asks for reduced motion.
+const REDUCED_MOTION = /@media \(prefers-reduced-motion:reduce\)\{\*\{[^}]*\}\}/g
 
 // How often a theme whose look follows the time is checked.
 const LOOK_CHECK_MS = 5 * 60 * 1000
@@ -67,7 +71,7 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'wallpaper',
-      description: `Change le fond : /wallpaper ${THEMES.map(t => t.id).join(' | ')} | off · /wallpaper sound on|off · /wallpaper place <lat> <lon> [fuseau]`,
+      description: `Change le fond : /wallpaper ${THEMES.map(t => t.id).join(' | ')} | off · /wallpaper sound on|off · /wallpaper motion on|auto · /wallpaper place <lat> <lon> [fuseau]`,
     })
 
     const t = await current($)
@@ -110,6 +114,21 @@ export const register: Register = on => {
           second === 'on'
             ? "Son de fin de tour activé (il n'est joué que là où Claude Code tourne sur un Mac)."
             : 'Son de fin de tour coupé.',
+      }
+    }
+    if (first === 'motion') {
+      if (second !== 'on' && second !== 'auto') {
+        const m = (await $.store.get(MOTION_KEY)) === 'on' ? 'on' : 'auto'
+        return { text: `Animations du fond : ${m}. Usage : /wallpaper motion on (toujours animé), ou /wallpaper motion auto (figé si le système demande de réduire les animations).` }
+      }
+      await $.store.set(MOTION_KEY, second)
+      const t = await current($)
+      if (t !== undefined) await apply($, t)
+      return {
+        text:
+          second === 'on'
+            ? 'Le fond reste animé même si le système demande de réduire les animations.'
+            : 'Le fond suit le réglage du système : figé quand il demande de réduire les animations.',
       }
     }
     if (first === 'place') {
@@ -172,7 +191,9 @@ export const register: Register = on => {
       return next(e)
     }
     const { Svg } = $.ui.resolve(e)
-    const source = t.render ? t.render(Date.now(), await placeOf($)) : t.svg
+    let source = t.render ? t.render(Date.now(), await placeOf($)) : t.svg
+    // Asked to keep moving: drop the scene's reduced-motion rule.
+    if ((await $.store.get(MOTION_KEY)) === 'on') source = source.replace(REDUCED_MOTION, '')
 
     return <Svg source={source} alt={t.alt} isInteractive />
   })
