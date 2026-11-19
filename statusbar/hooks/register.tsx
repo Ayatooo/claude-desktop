@@ -2,7 +2,8 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, SessionContextUsage, SessionRateLimit } from 'claude-code'
 
 import type { Repo, Window } from '../types'
-import { countdown, level, ticksSvg, ticksText } from './ticks'
+import { countdown, level, stripColor, ticksSvg, ticksText } from './ticks'
+import type { Gauge } from './ticks'
 
 const PLUGIN = 'statusbar'
 const usageAtom = atom({ plugin: 'statusbar', key: 'usage' } as const, {})
@@ -79,23 +80,22 @@ export const register: Register = on => {
     // The terminal draws no vector strips: it gets them in characters.
     const Svg = e.surface !== 'terminal' && 'Svg' in table ? table.Svg : undefined
 
-    const quota = (key: string, label: string, percent: number | undefined, resetsAt?: string) => {
+    const quota = (key: Gauge, label: string, percent: number | undefined, resetsAt?: string) => {
       if (percent === undefined) return null
       const shown = Math.round(percent)
       const left = countdown(resetsAt, now)
-      const color = level(percent) === 'calm' ? 'text' : level(percent) === 'warm' ? 'warning' : 'error'
+      const color = level(percent) === 'calm' ? stripColor(key, percent) : level(percent) === 'warm' ? 'warning' : 'error'
       let strip
       if (Svg !== undefined) {
-        const t = ticksSvg(percent)
+        const t = ticksSvg(key, percent)
         strip = <Svg source={t.source} alt={`${label} ${shown} %`} width={t.width} height={t.height} />
       } else {
-        const t = ticksText(percent)
+        const t = ticksText(key, percent)
         strip = (
           <Text>
             <Text color={t.color}>{t.filled}</Text>
-            <Text dimColor>{t.rest}</Text>
-            <Text color="warning" dimColor>
-              {t.tail}
+            <Text color={t.color} dimColor>
+              {t.rest}
             </Text>
           </Text>
         )

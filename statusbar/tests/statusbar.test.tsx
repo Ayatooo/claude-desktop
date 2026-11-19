@@ -43,6 +43,20 @@ test('a quota past 80 % turns warm', async ($, on) => {
   await ui.unmount()
 })
 
+test('each quota has its own colour while calm, its empty ticks a faint shade of it', async ($, on) => {
+  seed(on, USAGE)
+  const ui = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  const colorOf = async (text: RegExp) => ((await ui.find({ type: 'Text', text }))?.props as { color?: string } | undefined)?.color
+  expect(await colorOf(/^9/)).toBe('#a78bfa')
+  expect(await colorOf(/^6/)).toBe('#22d3ee')
+  expect(await colorOf(/^49/)).toBe('#4ade80')
+  const strips = (await ui.findAll({ type: 'Svg' })).map(s => (s.props as { source: string }).source)
+  expect(strips).toHaveLength(3)
+  ;['#a78bfa', '#22d3ee', '#4ade80'].forEach((c, i) => expect(strips[i]).toContain(`fill="${c}"`))
+  expect(strips[2]).toContain('opacity="0.18"')
+  await ui.unmount()
+})
+
 test('the terminal draws the strips in characters', async ($, on) => {
   seed(on, USAGE)
   const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })

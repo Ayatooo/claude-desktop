@@ -1,6 +1,6 @@
 {
   "name": "statusbar",
-  "version": "0.1.2",
-  "description": "A quiet bar above the prompt: project and branch on the left, context and usage limits as thin tick strips on the right",
+  "version": "0.2.0",
+  "description": "A quiet bar above the prompt: project and branch on the left, context and usage limits as tick strips, one colour each on the right",
   "types": "./types/index.d.ts"
 }
