@@ -149,3 +149,11 @@ test('no scene holds a /* the engine would read as an open CSS comment', () => {
     expect(`${name}: ${bare.includes('/*')}`).toBe(`${name}: false`)
   }
 })
+
+// The desktop app shows no autumn night while its cell art holds a `\`:
+// cell art draws it as a mirrored `/`.
+test('the autumn night and its thumbnail hold no backslash', () => {
+  for (const name of ['AUTUMN_SVG', 'AUTUMN_THUMB'] as const) {
+    expect(`${name}: ${SCENES[name].includes('\\')}`).toBe(`${name}: false`)
+  }
+})
