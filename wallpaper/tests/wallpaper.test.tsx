@@ -1,6 +1,8 @@
 import { expect, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
+import * as SCENES from '../hooks/generated-scenes'
+
 const SPINNER = {
   plugin: 'wallpaper',
   component: 'Spinner',
@@ -137,4 +139,13 @@ test('/wallpaper opens the picker; a pick applies the theme and closes it', asyn
   const after = await $.ui.mount({ ...BAND, surface: 'desktop' })
   expect(await after.find({ key: 'pick-ocean' })).toBeUndefined()
   await after.unmount()
+})
+
+// The engine refuses a whole backdrop holding a `/*` outside a closed CSS
+// comment, as the ASCII art's `/` and `*` side by side once did.
+test('no scene holds a /* the engine would read as an open CSS comment', () => {
+  for (const [name, svg] of Object.entries(SCENES)) {
+    const bare = svg.replace(/<style[^>]*>[^<]*<\/style>/g, '')
+    expect(`${name}: ${bare.includes('/*')}`).toBe(`${name}: false`)
+  }
 })

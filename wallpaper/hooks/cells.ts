@@ -85,7 +85,14 @@ export function gridSvg(g: Grid, ox = 0, oy = 0, opts: { bgOpacity?: number; fon
     out += `<path d="${d}" fill="${bg}"${opts.bgOpacity !== undefined ? ` fill-opacity="${opts.bgOpacity}"` : ''}/>`
   }
   for (const [fg, t] of byFg) {
-    out += `<text x="${t.xs.join(' ')}" y="${t.ys.join(' ')}" fill="${fg}">${esc(t.s)}</text>`
+    // The engine refuses a backdrop whose text holds `/*` (a CSS comment that
+    // never closes). Each glyph has its own position, so their order is free:
+    // the stars go first, and a `/` is never followed by a `*`.
+    const glyphs = Array.from(t.s)
+    const order = glyphs.map((_, i) => i).sort((a, b) => Number(glyphs[a] !== '*') - Number(glyphs[b] !== '*'))
+    const xs = order.map(i => t.xs[i]).join(' ')
+    const ys = order.map(i => t.ys[i]).join(' ')
+    out += `<text x="${xs}" y="${ys}" fill="${fg}">${esc(order.map(i => glyphs[i]).join(''))}</text>`
   }
   return `<g class="cl"${opts.font ? ` font-size="${opts.font}"` : ''}>${out}</g>`
 }

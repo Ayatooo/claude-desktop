@@ -27,6 +27,11 @@ export function rng(seed: number) {
 
 export const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+// The engine refuses a backdrop whose text holds `/*` (it reads it as a CSS
+// comment that never closes): a run is cut there into a second tspan, which
+// goes on at the same pen position, so nothing moves.
+export const spanText = (s: string) => esc(s).split('/*').join('/</tspan><tspan>*')
+
 export const n = (v: number) => (Math.round(v * 10) / 10).toString()
 
 function hex(c: string): [number, number, number] {
@@ -109,7 +114,7 @@ export function stage(opts: StageOptions) {
       lines.forEach((l, r) => {
         const s = l.search(/\S/)
         if (s < 0) return
-        spans += `<tspan x="${s * 6}" y="${r * 12 + 10}">${esc(l.slice(s).trimEnd())}</tspan>`
+        spans += `<tspan x="${s * 6}" y="${r * 12 + 10}">${spanText(l.slice(s).trimEnd())}</tspan>`
       })
       if (spans !== '') out += `<text fill="${tint(color)}">${spans}</text>`
     }

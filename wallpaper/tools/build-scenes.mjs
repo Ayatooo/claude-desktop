@@ -56,6 +56,15 @@ for (const name of wanted) {
     failed = true
     continue
   }
+  // The engine refuses a backdrop holding `/*` anywhere but in a closed CSS
+  // comment (the ASCII art's `/` and `*` side by side, say).
+  const bare = svg.replace(/<style[^>]*>[^<]*<\/style>/g, '')
+  const comment = bare.indexOf('/*')
+  if (comment >= 0) {
+    console.error(`${name}: a /* at ${comment}: …${bare.slice(Math.max(0, comment - 40), comment + 10)}…`)
+    failed = true
+    continue
+  }
   if (svg.length > LIMIT) {
     console.error(`${name}: too large, ${svg.length} characters (limit ${LIMIT}).`)
     failed = true
