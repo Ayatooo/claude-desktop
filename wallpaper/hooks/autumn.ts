@@ -16,6 +16,20 @@ import { GOLD, ORANGE, RED, WINDOW, bareTree, bat, cabin, cat, farTree, fence, f
 import { H, W, esc, mix, n, rng, stage } from './stage'
 import type { Drawn, Pass } from './stage'
 
+// A wide view (a desktop window much wider than 16:10) crops the scene's top
+// and bottom by the same height, which hid the ground where the cat and the
+// fox walk. There, the land rises and the sky (moon, witch, bats) comes down
+// by that height, so both stay in view. Each step uses its narrowest aspect,
+// so nothing is lifted further than the view crops.
+const WIDE = [1.8, 2, 2.2, 2.4, 2.7, 3].map(a => {
+  const h = Math.round((H - W / a) / 2)
+  return `@media (min-aspect-ratio:${Math.round(a * 10)}/10){#fit{transform:translateY(-${h}px)}#sky{transform:translateY(${2 * h}px)}}`
+})
+
+// Falling leaves: how many, and their frames a second (see the leaves below).
+const LEAVES = 8
+const LEAF_FPS = 10
+
 const st = stage({ cycle: 420, slow: 1 })
 const { kf, frameAnim } = st
 
@@ -156,7 +170,10 @@ function build(): string {
     .map(([x, y, rx, ry, d], i) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#c9b2cf" opacity=".1" filter="url(#haze)" style="animation:fog ${d}s ease-in-out ${-i * 20}s infinite alternate"/>`)
     .join('')
 
-  // Leaves falling, turning, swaying in the breeze.
+  // Leaves falling, turning, swaying in the breeze. Few of them, stepped at
+  // LEAF_FPS: the desktop app holds a scene still when it costs too much to
+  // draw, and 34 leaves turning at 60 frames a second over the cell art did.
+  // A leaf falls about 25 px a second, so ten steps a second still look smooth.
   ;[0, 1, 2].forEach(k =>
     kf(
       `lf${k}`,
@@ -165,9 +182,9 @@ function build(): string {
   )
   let leaves = ''
   const leafTints = ['#e0782e', '#c8452a', '#e8b040', '#b8582a', '#f09a48']
-  for (let i = 0; i < 34; i++) {
+  for (let i = 0; i < LEAVES; i++) {
     const dur = 26 + r() * 30
-    leaves += `<g transform="translate(${Math.round(r() * W)},-30)"><text class="fb" fill="${leafTints[i % leafTints.length]}" font-size="${12 + Math.round(r() * 6)}" style="animation:lf${i % 3} ${n(dur)}s linear ${n(-r() * dur)}s infinite">${esc(['*', ',', "'", '~', '%', 'v', '&'][i % 7]!)}</text></g>`
+    leaves += `<g transform="translate(${Math.round(r() * W)},-30)"><text class="fb" fill="${leafTints[i % leafTints.length]}" font-size="${12 + Math.round(r() * 6)}" style="animation:lf${i % 3} ${n(dur)}s steps(${Math.round(dur * LEAF_FPS)},end) ${n(-r() * dur)}s infinite">${esc(['*', ',', "'", '~', '%', 'v', '&'][i % 7]!)}</text></g>`
   }
 
   // Passers-by.
@@ -218,13 +235,14 @@ function build(): string {
 <radialGradient id="candle" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb040" stop-opacity=".45"/><stop offset="1" stop-color="#ff8a20" stop-opacity="0"/></radialGradient>
 <radialGradient id="vignette" cx=".5" cy=".45" r=".8"><stop offset=".6" stop-color="#0c0612" stop-opacity="0"/><stop offset="1" stop-color="#0c0612" stop-opacity=".65"/></radialGradient>
 <filter id="haze" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="22"/></filter>`,
-    css: [CELL_CSS],
+    css: [CELL_CSS, ...WIDE],
     back: [`<rect width="${W}" height="${H}" fill="url(#sky)"/>`, stars()],
     layers: [
       `<g style="animation:dusk 170s ease-in-out infinite alternate"><ellipse cx="900" cy="${HORIZON * CH}" rx="760" ry="220" fill="url(#dusk)"/></g>`,
-      `<circle cx="${n(124.5 * CW)}" cy="${n(16.5 * CH)}" r="260" fill="url(#moonGlow)" style="animation:glow 9s ease-in-out infinite alternate"/>`,
+      `<g id="sky"><circle cx="${n(124.5 * CW)}" cy="${n(16.5 * CH)}" r="260" fill="url(#moonGlow)" style="animation:glow 9s ease-in-out infinite alternate"/>`,
       gridSvg(moonG),
       ...sky,
+      '</g>',
       hills(),
       `<rect y="${(HORIZON + 4) * CH}" width="${W}" height="${H - (HORIZON + 4) * CH}" fill="url(#field)"/>`,
       field(),
