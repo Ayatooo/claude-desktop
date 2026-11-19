@@ -60,9 +60,10 @@ function stars(): string {
   for (let i = 0; i < 70; i++) {
     const y = Math.round(Math.pow(r(), 1.6) * 520)
     const v = r()
-    out += `<text x="${Math.round(r() * W)}" y="${y}" style="animation:tw${i % 3} ${n(4 + r() * 6)}s ease-in-out ${n(-r() * 8)}s infinite">${v < 0.6 ? '.' : v < 0.85 ? '+' : '*'}</text>`
+    // A dot rather than a glyph: cheaper to paint again as it twinkles.
+    out += `<circle cx="${Math.round(r() * W)}" cy="${y - 4}" r="${v < 0.6 ? 1.2 : v < 0.85 ? 1.8 : 2.4}" style="animation:tw${i % 3} ${n(4 + r() * 6)}s ease-in-out ${n(-r() * 8)}s infinite"/>`
   }
-  return `<g font-size="12" fill="#f3d9b0" opacity=".7">${out}</g>`
+  return `<g fill="#f3d9b0" opacity=".7">${out}</g>`
 }
 
 function hills(): string {
@@ -78,7 +79,7 @@ function hills(): string {
     for (let y = front(c); y <= HORIZON + 4; y++) g.set(c, y, { bg: y === front(c) ? '#3d1f32' : '#30192c', fg: '#4a2840', ch: y === front(c) ? '-' : r() < 0.05 ? ',' : ' ' })
     if (r() < 0.12) farTree(g, c, front(c), 2 + Math.floor(r() * 3), ['#5e2a26', '#6a3a1e', '#4e2030'][Math.floor(r() * 3)]!, '*')
   }
-  return gridSvg(g)
+  return gridSvg(g, 0, 0, { glyphs: false })
 }
 
 // ---------- Field ----------
@@ -101,7 +102,7 @@ function field(): string {
     const w = 1 + Math.round(t * 4)
     for (let x = -w; x <= w; x++) g.set(c + x, y, { bg: x === -w || x === w ? '#33202a' : '#3c2630', fg: '#57384a', ch: r() < 0.3 ? '.' : ' ' })
   }
-  return gridSvg(g)
+  return gridSvg(g, 0, 0, { glyphs: false })
 }
 
 // ---------- Assembly ----------
@@ -250,9 +251,9 @@ function build(): string {
       gridSvg(cab),
       `<g style="animation:flick 5s ease-in-out infinite">${gridSvg(lit)}</g>`,
       `<g font-size="16" fill="#9a8a9e" opacity=".55">${smoke}</g>`,
-      gridSvg(fen),
+      gridSvg(fen, 0, 0, { glyphs: false }),
       ...ground,
-      gridSvg(trees),
+      gridSvg(trees, 0, 0, { glyphs: false }),
       `<g style="animation:blink 7s linear infinite">${gridSvg(eyes)}</g>`,
       candleGlow,
       gridSvg(pumpkins),

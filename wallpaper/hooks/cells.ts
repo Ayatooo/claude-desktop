@@ -49,7 +49,10 @@ export class Grid {
 
 // The grid as SVG, cell (0, 0) at (ox, oy). `opacity` applies to the
 // backgrounds alone (the glyphs stay crisp).
-export function gridSvg(g: Grid, ox = 0, oy = 0, opts: { bgOpacity?: number; font?: number } = {}): string {
+// `glyphs: false` draws the cells alone: a glyph is a text the app paints
+// again on every frame something moves over it, and thousands of them got a
+// scene held still for costing too much.
+export function gridSvg(g: Grid, ox = 0, oy = 0, opts: { bgOpacity?: number; font?: number; glyphs?: boolean } = {}): string {
   const byBg = new Map<string, Map<number, number[]>>()
   const byFg = new Map<string, { xs: number[]; ys: number[]; s: string }>()
   for (const { c, r, bg, fg, ch } of g.cells.values()) {
@@ -60,7 +63,7 @@ export function gridSvg(g: Grid, ox = 0, oy = 0, opts: { bgOpacity?: number; fon
       if (!cols) rows.set(r, (cols = []))
       cols.push(c)
     }
-    if (fg !== undefined && ch !== undefined && ch !== ' ') {
+    if (opts.glyphs !== false && fg !== undefined && ch !== undefined && ch !== ' ') {
       let t = byFg.get(fg)
       if (!t) byFg.set(fg, (t = { xs: [], ys: [], s: '' }))
       t.xs.push(ox + c * CW + CW / 2)

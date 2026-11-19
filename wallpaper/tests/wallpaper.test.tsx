@@ -223,3 +223,12 @@ test('a scene is named and marked after the release, under a glass with no blur'
   expect(marked.replace(/\W/g, '_')).toBe(release)
   await ui.unmount()
 })
+
+// The app holds a scene still when it costs too much to draw, glyphs first:
+// the autumn night froze with about 3,700 of them, and draws 809 now.
+test('the autumn night keeps under a thousand glyphs', () => {
+  const glyphs = [...SCENES.AUTUMN_SVG.matchAll(/<text[^>]*>([^<]*)<\/text>/g)]
+    .map(m => m[1]!.replace(/&(amp|lt|gt|quot|apos);/g, '&'))
+    .join('').length
+  expect(glyphs < 1000).toBe(true)
+})
