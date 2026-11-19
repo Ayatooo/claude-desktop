@@ -128,6 +128,7 @@ test('/wallpaper opens the picker; a pick applies the theme and closes it', asyn
     expect(await ui.find({ key: 'pick-koi' })).toBeDefined()
     expect(await ui.find({ key: 'pick-autumn' })).toBeDefined()
     expect(await ui.find({ key: 'pick-bloom' })).toBeDefined()
+    expect(await ui.find({ key: 'pick-night' })).toBeDefined()
     expect((await ui.find({ type: 'Svg' })) !== undefined).toBe(surface === 'desktop')
     await ui.unmount()
   }
@@ -152,8 +153,8 @@ test('no scene holds a /* the engine would read as an open CSS comment', () => {
 
 // The desktop app shows no autumn night while its cell art holds a `\`:
 // cell art draws it as a mirrored `/`.
-test('the autumn night and its thumbnail hold no backslash', () => {
-  for (const name of ['AUTUMN_SVG', 'AUTUMN_THUMB'] as const) {
+test('the cell-art scenes and their thumbnails hold no backslash', () => {
+  for (const name of ['AUTUMN_SVG', 'AUTUMN_THUMB', 'NIGHT_SVG', 'NIGHT_THUMB'] as const) {
     expect(`${name}: ${SCENES[name].includes('\\')}`).toBe(`${name}: false`)
   }
 })
@@ -226,9 +227,23 @@ test('a scene is named and marked after the release, under a glass with no blur'
 
 // The app holds a scene still when it costs too much to draw, glyphs first:
 // the autumn night froze with about 3,700 of them, and draws 809 now.
-test('the autumn night keeps under a thousand glyphs', () => {
-  const glyphs = [...SCENES.AUTUMN_SVG.matchAll(/<text[^>]*>([^<]*)<\/text>/g)]
-    .map(m => m[1]!.replace(/&(amp|lt|gt|quot|apos);/g, '&'))
-    .join('').length
-  expect(glyphs < 1000).toBe(true)
+test('the cell-art scenes keep under a thousand glyphs', () => {
+  for (const name of ['AUTUMN_SVG', 'NIGHT_SVG'] as const) {
+    const glyphs = [...SCENES[name].matchAll(/<text[^>]*>([^<]*)<\/text>/g)]
+      .map(m => m[1]!.replace(/&(amp|lt|gt|quot|apos);/g, '&'))
+      .join('').length
+    expect(`${name}: ${glyphs < 1000}`).toBe(`${name}: true`)
+  }
+})
+
+// A walker's frames each show for an exact share of its cycle: delays rounded
+// to a tenth of a second left a gap where none showed, and the fox blinked.
+test('the frames of a walker leave no gap between them', () => {
+  for (const [name, svg] of Object.entries(SCENES)) {
+    for (const m of svg.matchAll(/animation:fr(\d) ([\d.]+)s steps\(1,end\) (-?[\d.]+)s/g)) {
+      const [count, period, delay] = [Number(m[1]), Number(m[2]), -Number(m[3])]
+      const share = (delay / period) * count
+      expect(`${name}: ${Math.abs(share - Math.round(share)) < 0.001}`).toBe(`${name}: true`)
+    }
+  }
 })

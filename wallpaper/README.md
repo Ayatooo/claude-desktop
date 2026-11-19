@@ -1,6 +1,6 @@
 # wallpaper
 
-A Claude Code mod that dresses up the Claude app (desktop and mobile): animated wallpapers (an ASCII aquarium, an ASCII koi pond, a cosy autumn night in cell art, a halftone night garden), a wallpaper picker with live thumbnails, a little Claude creature above the prompt, an interface palette to match, a themed thinking indicator and a quiet end-of-turn sound.
+A Claude Code mod that dresses up the Claude app (desktop and mobile): animated wallpapers (an ASCII aquarium, an ASCII koi pond, a cosy autumn night and a cloudy night in cell art, a halftone night garden), a wallpaper picker with live thumbnails, a little Claude creature above the prompt, an interface palette to match, a themed thinking indicator and a quiet end-of-turn sound.
 
 ## Install
 
@@ -26,6 +26,10 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 
 `/wallpaper bloom`: glowing flowers in halftone dots on a black night. Every shape is filled with a dot screen instead of a flat colour and glows: a crescent moon, faint twinkling stars, flowers on dotted stems swaying and slowly breathing, spikes and buds, dotted grass, pollen and petals drifting, fireflies; now and then a moth flutters across. Its own palette (near black, turquoise accent), indicator words ("Fleurit dans le noir", "Rêve en pointillés"…) and sound (three glassy notes).
 
+## The cloudy night
+
+`/wallpaper night`: a deep blue night in cell art, after the style of the autumn night. A crescent moon in khaki cells with a halo of small dots, blue clouds made of characters (`S`, `t`, `%`, `X` on blue cells) drifting slowly from one edge to the other, stars twinkling over a faint grid, a blue glow on both edges, and now and then a shooting star. Kept light for the desktop app: a few hundred glyphs, no blur, the clouds stepped at 8 frames a second. Its own palette (night blue, periwinkle accent), indicator words ("Compte les étoiles", "Suit les nuages"…) and sound (the night garden's three glassy notes).
+
 ## Commands
 
 | Command | What it does |
@@ -34,6 +38,7 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 | `/wallpaper koi` | The koi pond. |
 | `/wallpaper autumn` | The autumn night. |
 | `/wallpaper bloom` | The night garden. |
+| `/wallpaper night` | The cloudy night. |
 | `/wallpaper off` | Back to the app's own look. |
 | `/wallpaper` | Opens (or closes) the picker above the prompt: an animated thumbnail per wallpaper, a click or its digit applies it, `0` for none. Sending a prompt closes it. |
 | `/wallpaper status` | Current state and settings. |
@@ -63,6 +68,7 @@ The texts a person reads are in French; the code is in English.
 - `hooks/ocean-models.ts` (the creatures and the reef as vector shapes) and `hooks/ocean.ts` (the staging).
 - `hooks/generated-scenes.ts`: the aquarium, prebuilt (**generated**: the mod loads it without computing anything). After changing a scene, its models, `ascii.ts` or `stage.ts`, run `node --experimental-strip-types tools/build-scenes.mjs`. The script refuses a scene over 131,072 characters, the limit for a backdrop (the aquarium is about 101,000, the pond and the autumn night about 115,000).
 - `hooks/cells.ts`: cell art, a grid of character cells with background colours, written as one path of rectangles per colour and one positioned `<text>` per glyph colour. `hooks/autumn-models.ts` (trees, cabin, pumpkins, moon, fence, the passers-by), `hooks/autumn.ts` (the scene) and `hooks/autumn-thumb.ts` (its thumbnail).
+- `hooks/night.ts`: the cloudy night in cell art (moon, drifting clouds, stars, a shooting star); its thumbnail is the same drawing cropped.
 - `hooks/bloom.ts`: the night garden, pure vector shapes filled with dot patterns under a glow filter; its thumbnail is the same drawing cropped.
 - `sounds/*.wav`: the end-of-turn sounds, synthesized.
 

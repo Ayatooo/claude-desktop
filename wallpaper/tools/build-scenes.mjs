@@ -20,6 +20,8 @@ const SCENES = {
   'autumn-thumb': ['autumn-thumb.ts', 'AUTUMN_THUMB'],
   bloom: ['bloom.ts', 'BLOOM_SVG'],
   'bloom-thumb': ['bloom.ts', 'BLOOM_THUMB'],
+  night: ['night.ts', 'NIGHT_SVG'],
+  'night-thumb': ['night.ts', 'NIGHT_THUMB'],
 }
 // The most characters a backdrop's SVG may hold.
 const LIMIT = 131072

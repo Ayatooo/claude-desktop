@@ -98,11 +98,14 @@ export function stage(opts: StageOptions) {
   // Loops n frames: each frame is visible for 1/n of the cycle.
   const frameAnim = (count: number, i: number, period: number): string => {
     if (count <= 1) return ''
+    // Exact to the millisecond: rounded to a tenth, the frames' delays left a
+    // gap each cycle where no frame showed, and a walker blinked.
+    const exact = (v: number) => (Math.round(v * 1e4) / 1e4).toString()
     const slot = 100 / count
     const name = `fr${count}`
-    kf(name, `0%{opacity:1}${n(slot)}%{opacity:0}100%{opacity:0}`)
+    kf(name, `0%{opacity:1}${exact(slot)}%{opacity:0}100%{opacity:0}`)
     const delay = -(((count - i) % count) * period) / count
-    return `animation:${name} ${n(period)}s steps(1,end) ${n(delay)}s infinite`
+    return `animation:${name} ${exact(period)}s steps(1,end) ${exact(delay)}s infinite`
   }
 
   // One frame (color → lines) on an integer grid: 6 × 12 cells at font

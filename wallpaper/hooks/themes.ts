@@ -6,7 +6,7 @@
 
 import type { ThemeBackdropGlass, ThemeColors } from 'claude-code'
 
-import { AUTUMN_SVG, AUTUMN_THUMB, BLOOM_SVG, BLOOM_THUMB, KOI_SVG, KOI_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
+import { AUTUMN_SVG, AUTUMN_THUMB, BLOOM_SVG, BLOOM_THUMB, KOI_SVG, KOI_THUMB, NIGHT_SVG, NIGHT_THUMB, OCEAN_SVG, OCEAN_THUMB } from './generated-scenes'
 import { makeColors } from './make-colors.js'
 
 type Palette = {
@@ -149,6 +149,32 @@ const SPECS: Spec[] = [
     spinner: {
       words: ['Fleurit dans le noir', 'Arrose les étoiles', 'Cueille la lune', 'Rêve en pointillés', 'Suit une luciole', 'Éclot doucement'],
       suffix: ' .:',
+    },
+    sound: 'sounds/bloom.wav',
+  },
+  {
+    id: 'night',
+    label: 'Nuit nuageuse',
+    alt: "Une nuit bleue en art ASCII à cellules colorées : un croissant de lune kaki entouré de petits points, des nuages bleus faits de caractères qui dérivent lentement, des étoiles qui scintillent sur une grille discrète, et parfois une étoile filante",
+    svg: NIGHT_SVG,
+    thumb: NIGHT_THUMB,
+    palette: {
+      label: 'Nuit',
+      roles: { accent: '#8fa2ff', danger: '#ff6b81', success: '#6ee7a8', warning: '#f5c15c', pro: '#b9a3ff' },
+      anchors: {
+        'surface-0': '#060b1e',
+        'surface-1': '#0a1230',
+        'surface-2': '#0f1a3c',
+        'surface-3': '#142148',
+        'text-primary': '#e8edff',
+        'text-secondary': '#bcc6ea',
+        'text-muted': '#949fc8',
+      },
+    },
+    glass: { blur: 0, tint: '#081030', opacity: 0.55 },
+    spinner: {
+      words: ['Compte les étoiles', 'Suit les nuages', 'Attend la lune', 'Rêve dans le ciel', 'Souffle sur les nuages', 'Veille tard'],
+      suffix: ' ·',
     },
     sound: 'sounds/bloom.wav',
   },
