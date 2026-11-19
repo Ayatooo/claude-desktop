@@ -1,5 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
+import type { RenderElement } from 'claude-code'
 
 import * as SCENES from '../hooks/generated-scenes'
 
@@ -98,6 +99,45 @@ test('pet off: the band is left to the engine', async ($, on) => {
   })
   const ui = await $.ui.mount({ ...BAND, surface: 'desktop' })
   expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+  await ui.unmount()
+})
+
+const LIST = {
+  plugin: 'wallpaper',
+  component: 'AbovePromptList',
+  requestId: 'band',
+  props: {
+    hasSurvey: false,
+    isCollapsed: false,
+    isWorking: false,
+    maxRows: 30,
+    bodyColumns: 100,
+    scroll: { offset: 0, bodyRows: 29 },
+    view: {},
+  },
+} as const
+
+test('beside the status bar, the creature stands on the band corner instead of taking a row', async ($, on) => {
+  on('store.get', (_, e) => ({ value: (e as { key?: string }).key === 'scene' ? 'ocean' : undefined }))
+  const rows = [
+    { plugin: 'wallpaper', tree: h('Text', {}, 'own row') as RenderElement },
+    { plugin: 'statusbar', tree: h('Text', {}, 'isiit / main') as RenderElement },
+  ]
+  const ui = await $.ui.mount({ ...LIST, surface: 'desktop', props: { ...LIST.props, rows } })
+  const svg = await ui.find({ type: 'Svg' })
+  expect(svg).toBeDefined()
+  const texts = (await ui.findAll({ type: 'Text' })).map(t => t.text)
+  expect(texts.includes('isiit / main')).toBe(true)
+  expect(texts.includes('own row')).toBe(false)
+  await ui.unmount()
+})
+
+test('alone in the band, the creature keeps its own row', async ($, on) => {
+  on('store.get', (_, e) => ({ value: (e as { key?: string }).key === 'scene' ? 'ocean' : undefined }))
+  const rows = [{ plugin: 'wallpaper', tree: h('Text', {}, 'own row') as RenderElement }]
+  const ui = await $.ui.mount({ ...LIST, surface: 'desktop', props: { ...LIST.props, rows } })
+  expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+  expect((await ui.find({ type: 'Text' }))?.text).toBe('own row')
   await ui.unmount()
 })
 

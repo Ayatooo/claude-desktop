@@ -42,7 +42,7 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 | `/wallpaper off` | Back to the app's own look. |
 | `/wallpaper` | Opens (or closes) the picker above the prompt: an animated thumbnail per wallpaper, a click or its digit applies it, `0` for none. Sending a prompt closes it. |
 | `/wallpaper status` | Current state and settings. |
-| `/wallpaper pet on` / `off` | The little Claude creature above the prompt (desktop and mobile). It blinks, looks around, takes a short walk, hops and waves now and then; bounces under a twinkling star while Claude works; hops with sparkles when a turn ends. |
+| `/wallpaper pet on` / `off` | The little Claude creature above the prompt (desktop and mobile). It blinks, looks around, takes a short walk, hops and waves now and then; bounces under a twinkling star while Claude works; hops with sparkles when a turn ends. When another mod draws a row in the band (the statusbar, say), it stands on that row's bottom-right corner instead of taking a row of its own. |
 | `/wallpaper sound on` / `off` | End-of-turn sound (a bubble). It only plays where Claude Code runs on a Mac (the engine plays it with `afplay`). |
 | `/wallpaper motion on` / `auto` | `auto` (default): the aquarium freezes on a still frame when the system asks for reduced motion (on Windows: Settings > Accessibility > Visual effects > Animation effects off). `on`: it keeps moving anyway. |
 | `/wallpaper glass 0`…`100` / `default` | How opaque the frosted glass is that the desktop app lays on its panels over the scene, the band of the creature above the prompt included: `0` lets the scene show through, `default` goes back to each wallpaper's own (60 % for most). |
@@ -57,7 +57,7 @@ The texts a person reads are in French; the code is in English.
 
 ## How it works
 
-- `hooks/register.tsx`: the `/wallpaper` command, the backdrop, the thinking indicator, the end-of-turn sound, and the band above the prompt (picker and creature).
+- `hooks/register.tsx`: the `/wallpaper` command, the backdrop, the thinking indicator, the end-of-turn sound, and the band above the prompt (picker and creature, a row of its own when alone, over the band's bottom-right corner beside another mod's row).
 - `hooks/mascot.ts`: the creature, pixel art in an SVG strip animated in CSS, in three moods (idle, working, happy).
 - `hooks/ocean-thumb.ts`: the aquarium's thumbnail for the picker (prebuilt into `generated-scenes.ts` too).
 - `hooks/koi-models.ts` (koi in three parts, lily pad, lotus, dragonfly), `hooks/koi.ts` (the pond: koi follow cubic curves sampled into keyframes, turned along the path; each koi's rear and tail sway at their joints in CSS, so a fish is drawn once instead of frame by frame) and `hooks/koi-thumb.ts` (its thumbnail).

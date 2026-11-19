@@ -10,6 +10,7 @@ const SCENE_KEY = 'scene'
 const SOUND_KEY = 'sound'
 const MOTION_KEY = 'motion'
 const PET_KEY = 'pet'
+const PLUGIN = 'wallpaper'
 const GLASS_KEY = 'glass'
 
 const isPickerOpen = atom({ plugin: 'wallpaper', key: 'isPickerOpen' } as const, false)
@@ -76,6 +77,18 @@ function pick(text: string, count: number): number {
 }
 
 const fold = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+// The little creature's drawing for this mood, or undefined where it is off
+// or the surface draws no vector art.
+async function petSource($: EngineInterface, surface: string, isWorking: boolean): Promise<string | undefined> {
+  if ((surface !== 'desktop' && surface !== 'mobile') || (await $.store.get(PET_KEY)) === 'off') {
+    return undefined
+  }
+  const keepMoving = (await $.store.get(MOTION_KEY)) === 'on'
+  const turns = await read($, turnsDone)
+  const mood: Mood = isWorking ? 'working' : turns > 0 ? 'happy' : 'idle'
+  return keepMoving ? MASCOT[mood].replace(REDUCED_MOTION, '') : MASCOT[mood]
+}
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
@@ -258,21 +271,22 @@ export const register: Register = on => {
   })
 
   // The band above the prompt: the wallpaper picker when open, and the
-  // little creature.
+  // little creature when no other row is there to carry it (see below).
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey) {
       return next(e)
     }
     const graphic = e.surface === 'desktop' || e.surface === 'mobile'
     const showPicker = await read($, isPickerOpen)
-    const showPet = graphic && (await $.store.get(PET_KEY)) !== 'off'
-    if (!showPicker && !showPet) {
+    const table = $.ui.resolve(e)
+    // With the picker open, the creature sits over the band's corner instead.
+    const pet = showPicker ? undefined : await petSource($, e.surface, e.props.isWorking)
+    if (!showPicker && (pet === undefined || !('Svg' in table))) {
       return next(e)
     }
     const t = await current($)
     const keepMoving = (await $.store.get(MOTION_KEY)) === 'on'
     const still = (svg: string) => (keepMoving ? svg.replace(REDUCED_MOTION, '') : svg)
-    const table = $.ui.resolve(e)
     const { Box, Text, Button } = table
     // The terminal has no vector drawings: the picker is buttons alone there.
     const Svg = graphic && 'Svg' in table ? table.Svg : undefined
@@ -288,50 +302,67 @@ export const register: Register = on => {
       await close()
     }
 
-    let picker = null
-    if (showPicker) {
-      const tiles = THEMES.map((theme, i) => {
-        const isActive = theme.id === t?.id
-        const label = `${theme.label}${isActive ? ' ✓' : ''}`
-        return (
-          <Box key={`tile-${theme.id}`} flexDirection="column" alignItems="center" gap={0}>
-            {Svg !== undefined ? <Svg source={still(theme.thumb)} alt={theme.alt} width={144} height={81} isInteractive /> : null}
-            <Button key={`pick-${theme.id}`} label={label} hotkey={String(i + 1)} variant={isActive ? 'primary' : 'secondary'} onPress={() => choose(theme)} />
-          </Box>
-        )
-      })
-      picker = (
-        <Box key="picker" flexDirection="column" borderStyle="round" paddingX={1} gap={1}>
-          <Box flexDirection="row" justifyContent="space-between" alignItems="center">
-            <Text>
-              <Text bold>/wallpaper</Text>
-              <Text dimColor> Fonds animés en ASCII · touche 1{THEMES.length > 1 ? ` à ${THEMES.length}` : ''} pour choisir, 0 pour aucun</Text>
-            </Text>
-            <Button key="close" label="Fermer" role="dismiss" onPress={close} />
-          </Box>
-          <Box flexDirection="row" flexWrap="wrap" gap={1} alignItems="flex-end">
-            {tiles}
-            <Button key="pick-off" label={t === undefined ? 'Aucun fond ✓' : 'Aucun fond'} hotkey="0" dimColor onPress={() => choose(undefined)} />
-          </Box>
-        </Box>
-      )
-    }
-
-    let pet = null
-    if (showPet && Svg !== undefined) {
-      const turns = await read($, turnsDone)
-      const mood: Mood = e.props.isWorking ? 'working' : turns > 0 ? 'happy' : 'idle'
-      pet = (
+    if (!showPicker) {
+      return (
         <Box flexDirection="row" justifyContent="flex-end">
-          <Svg source={still(MASCOT[mood])} alt="La petite bestiole de Claude" width={MASCOT_SIZE.width} height={MASCOT_SIZE.height} isInteractive />
+          {Svg !== undefined && pet !== undefined ? <Svg source={pet} alt="La petite bestiole de Claude" width={MASCOT_SIZE.width} height={MASCOT_SIZE.height} isInteractive /> : null}
         </Box>
       )
     }
 
+    const tiles = THEMES.map((theme, i) => {
+      const isActive = theme.id === t?.id
+      const label = `${theme.label}${isActive ? ' ✓' : ''}`
+      return (
+        <Box key={`tile-${theme.id}`} flexDirection="column" alignItems="center" gap={0}>
+          {Svg !== undefined ? <Svg source={still(theme.thumb)} alt={theme.alt} width={144} height={81} isInteractive /> : null}
+          <Button key={`pick-${theme.id}`} label={label} hotkey={String(i + 1)} variant={isActive ? 'primary' : 'secondary'} onPress={() => choose(theme)} />
+        </Box>
+      )
+    })
+    return (
+      <Box key="picker" flexDirection="column" borderStyle="round" paddingX={1} gap={1}>
+        <Box flexDirection="row" justifyContent="space-between" alignItems="center">
+          <Text>
+            <Text bold>/wallpaper</Text>
+            <Text dimColor> Fonds animés en ASCII · touche 1{THEMES.length > 1 ? ` à ${THEMES.length}` : ''} pour choisir, 0 pour aucun</Text>
+          </Text>
+          <Button key="close" label="Fermer" role="dismiss" onPress={close} />
+        </Box>
+        <Box flexDirection="row" flexWrap="wrap" gap={1} alignItems="flex-end">
+          {tiles}
+          <Button key="pick-off" label={t === undefined ? 'Aucun fond ✓' : 'Aucun fond'} hotkey="0" dimColor onPress={() => choose(undefined)} />
+        </Box>
+      </Box>
+    )
+  })
+
+  // When another row shares the band (the status bar, say), the creature
+  // leaves a row of its own and stands on the band's bottom-right corner,
+  // painted over the last row without moving it. Alone, it keeps its row.
+  on('ui.render', { component: 'AbovePromptList' }, async ($, e, next) => {
+    if (e.props.hasSurvey) {
+      return next(e)
+    }
+    const others = e.props.rows.filter(r => r.plugin !== PLUGIN)
+    const showPicker = await read($, isPickerOpen)
+    if (others.length === 0 && !showPicker) {
+      return next(e)
+    }
+    const table = $.ui.resolve(e)
+    const pet = await petSource($, e.surface, e.props.isWorking)
+    if (pet === undefined || !('Svg' in table)) {
+      return next(e)
+    }
+    const rows = showPicker ? e.props.rows : others
+    const band = await next({ ...e, props: { ...e.props, rows } })
+    const { Box, Svg } = table
     return (
       <Box flexDirection="column">
-        {picker}
-        {pet}
+        {band}
+        <Box position="absolute" right={1} bottom={0}>
+          <Svg source={pet} alt="La petite bestiole de Claude" width={MASCOT_SIZE.width} height={MASCOT_SIZE.height} isInteractive />
+        </Box>
       </Box>
     )
   })
