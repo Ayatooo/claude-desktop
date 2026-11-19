@@ -188,3 +188,38 @@ test('/wallpaper glass lowers the opacity of the glass over the scene, and defau
   await run('glass 250')
   expect(glasses.length).toBe(2)
 })
+
+// The app remembers a scene it held still: each release names its scenes after
+// the plugin's version and says it in their markup, and frosts no panel.
+test('a scene is named and marked after the release, under a glass with no blur', async ($, on) => {
+  const stored: Record<string, unknown> = { scene: 'autumn' }
+  on('store.get', (_, e) => ({ value: stored[(e as { key: string }).key] }))
+  on('store.set', (_, e) => {
+    const { key, value } = e as { key: string; value: unknown }
+    stored[key] = value
+    return { value: undefined }
+  })
+  const sets: { scene?: string; glass?: { blur?: number } }[] = []
+  on('theme.set', (_, e) => {
+    sets.push((e as { backdrop: { scene?: string; glass?: { blur?: number } } }).backdrop)
+    return { value: { isDrawn: true, requestId: 't' } }
+  })
+  on('command.run', () => ({}))
+  on('ui.status', () => ({ value: undefined }))
+  await $.command.run({ command: 'wallpaper', args: 'autumn', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 100 } })
+  const scene = sets.at(-1)?.scene ?? ''
+  const release = /^autumn-(\w+)$/.exec(scene)?.[1]
+  expect(release === undefined).toBe(false)
+  expect(sets.at(-1)?.glass?.blur).toBe(0)
+  const ui = await $.ui.mount({
+    plugin: 'wallpaper',
+    component: 'Backdrop',
+    requestId: 'backdrop',
+    surface: 'desktop',
+    props: { scene, plugin: 'wallpaper', glass: { blur: 0, opacity: 0.6 } },
+  })
+  const source = String(((await ui.find({ type: 'Svg' }))?.props as { source?: string } | undefined)?.source ?? '')
+  const marked = /<!-- wallpaper ([\w.]+) -->/.exec(source)?.[1] ?? ''
+  expect(marked.replace(/\W/g, '_')).toBe(release)
+  await ui.unmount()
+})

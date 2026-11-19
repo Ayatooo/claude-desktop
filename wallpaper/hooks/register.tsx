@@ -28,6 +28,20 @@ async function glassOpacity($: EngineInterface): Promise<number | undefined> {
   return typeof v === 'number' && v >= 0 && v <= 1 ? v : undefined
 }
 
+// The app remembers a scene it held still and holds it still at once when it
+// comes back. Each release names its scenes after the plugin's version and
+// says it in their markup, so a mended scene starts afresh.
+let version: Promise<string> | undefined
+function release($: EngineInterface): Promise<string> {
+  version ??= $.fs
+    .read(`${$.plugin.root}/.claude-plugin/plugin.json`)
+    .then(text => String((JSON.parse(text) as { version?: unknown }).version ?? '0'))
+    .catch(() => '0')
+  return version
+}
+const sceneName = async ($: EngineInterface, t: Theme) => `${t.id}-${(await release($)).replace(/[^\w]/g, '_')}`
+const themeOfScene = (scene: string) => themeById(scene.replace(/-[\w]+$/, ''))
+
 async function apply($: EngineInterface, t: Theme) {
   // The app frosts its panels over the scene, the band of the creature above
   // the prompt included: the opacity of that glass is the person's to lower.
@@ -35,7 +49,7 @@ async function apply($: EngineInterface, t: Theme) {
   const args: ThemeSetArgs = {
     colors: t.colors,
     overrideColorScheme: 'dark',
-    backdrop: { scene: t.id, glass: opacity === undefined ? t.glass : { ...t.glass, opacity } },
+    backdrop: { scene: await sceneName($, t), glass: opacity === undefined ? t.glass : { ...t.glass, opacity } },
   }
   const set = await $.theme.set(args)
   $.ui.status(set.isDrawn ? undefined : set.reason)
@@ -193,7 +207,7 @@ export const register: Register = on => {
     if (e.surface !== 'desktop' && e.surface !== 'mobile') {
       return next(e)
     }
-    const t = themeById(e.props.scene)
+    const t = themeOfScene(e.props.scene)
     if (t === undefined) {
       return next(e)
     }
@@ -201,6 +215,9 @@ export const register: Register = on => {
     let source = t.svg
     // Asked to keep moving: drop the scene's reduced-motion rule.
     if ((await $.store.get(MOTION_KEY)) === 'on') source = source.replace(REDUCED_MOTION, '')
+    // The release in the markup, so the app takes this scene for a new one.
+    const rel = await release($)
+    source = source.replace(/^<svg\b[^>]*>/, root => `${root}<!-- wallpaper ${rel} -->`)
 
     return <Svg source={source} alt={t.alt} isInteractive />
   })

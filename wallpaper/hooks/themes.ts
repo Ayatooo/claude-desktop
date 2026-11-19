@@ -33,6 +33,10 @@ export type Theme = {
   colors: ThemeColors
   // The contrast lines Desktop would refuse the palette for (empty when fine).
   problems: string[]
+  // No blur: the desktop app holds a scene still when it costs too much to
+  // draw, and frosting its panels over a moving scene did (the autumn night
+  // froze within seconds with a blur of 5, and kept moving with none). The
+  // tint and its opacity keep the text readable.
   glass: ThemeBackdropGlass
   // The thinking indicator: words in place of the engine's verb, and what
   // follows the word (in place of the ellipsis).
@@ -63,8 +67,7 @@ const SPECS: Spec[] = [
         'text-muted': '#93b4c2',
       },
     },
-    // Light blur: the ASCII stays readable behind the panels.
-    glass: { blur: 5, tint: '#041220', opacity: 0.62 },
+    glass: { blur: 0, tint: '#041220', opacity: 0.62 },
     spinner: {
       words: ['Nage avec les poissons', 'Suit le courant', 'Explore le récif', 'Plonge', 'Fait des bulles', 'Remonte doucement'],
       suffix: ' o°',
@@ -90,7 +93,7 @@ const SPECS: Spec[] = [
         'text-muted': '#94b3a4',
       },
     },
-    glass: { blur: 5, tint: '#06150f', opacity: 0.6 },
+    glass: { blur: 0, tint: '#06150f', opacity: 0.6 },
     spinner: {
       words: ['Glisse sous les nénuphars', "Fait des ronds dans l'eau", 'Médite au bord du bassin', 'Suit une koï', 'Écoute la libellule', 'Ondule doucement'],
       suffix: ' ~',
@@ -116,7 +119,7 @@ const SPECS: Spec[] = [
         'text-muted': '#b39ea6',
       },
     },
-    glass: { blur: 5, tint: '#120a18', opacity: 0.6 },
+    glass: { blur: 0, tint: '#120a18', opacity: 0.6 },
     spinner: {
       words: ['Ramasse les feuilles', 'Sculpte une citrouille', 'Allume une bougie', 'Boit un chocolat chaud', 'Écoute la chouette', 'Rentre du bois'],
       suffix: ' *',
@@ -142,7 +145,7 @@ const SPECS: Spec[] = [
         'text-muted': '#7fb0a6',
       },
     },
-    glass: { blur: 4, tint: '#020506', opacity: 0.55 },
+    glass: { blur: 0, tint: '#020506', opacity: 0.55 },
     spinner: {
       words: ['Fleurit dans le noir', 'Arrose les étoiles', 'Cueille la lune', 'Rêve en pointillés', 'Suit une luciole', 'Éclot doucement'],
       suffix: ' .:',
