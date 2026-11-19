@@ -1,6 +1,6 @@
 {
   "name": "wallpaper",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Animated wallpapers for the Claude app (an ASCII aquarium and koi pond, a cosy autumn night in cell art, a halftone night garden), with a picker, a little Claude creature above the prompt, matching palettes, thinking indicators and end-of-turn sounds",
   "types": "./types/index.d.ts"
 }

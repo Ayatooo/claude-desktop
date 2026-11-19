@@ -10,6 +10,7 @@ const SCENE_KEY = 'scene'
 const SOUND_KEY = 'sound'
 const MOTION_KEY = 'motion'
 const PET_KEY = 'pet'
+const GLASS_KEY = 'glass'
 
 const isPickerOpen = atom({ plugin: 'wallpaper', key: 'isPickerOpen' } as const, false)
 const turnsDone = atom({ plugin: 'wallpaper', key: 'turnsDone' } as const, 0)
@@ -20,11 +21,21 @@ const MASCOT: Record<Mood, string> = { idle: mascotSvg('idle'), working: mascotS
 // The rule each scene carries to freeze when the system asks for reduced motion.
 const REDUCED_MOTION = /@media \(prefers-reduced-motion:reduce\)\{\*\{[^}]*\}\}/g
 
+// The glass's opacity the person chose with /wallpaper glass (0 to 1), or
+// undefined for each theme's own.
+async function glassOpacity($: EngineInterface): Promise<number | undefined> {
+  const v = await $.store.get(GLASS_KEY)
+  return typeof v === 'number' && v >= 0 && v <= 1 ? v : undefined
+}
+
 async function apply($: EngineInterface, t: Theme) {
+  // The app frosts its panels over the scene, the band of the creature above
+  // the prompt included: the opacity of that glass is the person's to lower.
+  const opacity = await glassOpacity($)
   const args: ThemeSetArgs = {
     colors: t.colors,
     overrideColorScheme: 'dark',
-    backdrop: { scene: t.id, glass: t.glass },
+    backdrop: { scene: t.id, glass: opacity === undefined ? t.glass : { ...t.glass, opacity } },
   }
   const set = await $.theme.set(args)
   $.ui.status(set.isDrawn ? undefined : set.reason)
@@ -56,7 +67,7 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'wallpaper',
-      description: `Ouvre le sélecteur de fonds · /wallpaper ${THEMES.map(t => t.id).join(' | ')} | off · /wallpaper pet on|off · /wallpaper sound on|off · /wallpaper motion on|auto · /wallpaper status`,
+      description: `Ouvre le sélecteur de fonds · /wallpaper ${THEMES.map(t => t.id).join(' | ')} | off · /wallpaper pet on|off · /wallpaper sound on|off · /wallpaper motion on|auto · /wallpaper glass 0-100|default · /wallpaper status`,
     })
 
     const t = await current($)
@@ -93,6 +104,26 @@ export const register: Register = on => {
           second === 'on'
             ? "Son de fin de tour activé (il n'est joué que là où Claude Code tourne sur un Mac)."
             : 'Son de fin de tour coupé.',
+      }
+    }
+    if (first === 'glass') {
+      if (second === 'default') {
+        await $.store.delete(GLASS_KEY)
+      } else if (/^\d{1,3}$/.test(second) && Number(second) <= 100) {
+        await $.store.set(GLASS_KEY, Number(second) / 100)
+      } else {
+        const o = await glassOpacity($)
+        return {
+          text: `Opacité du verre des panneaux : ${o === undefined ? 'celle du fond' : `${Math.round(o * 100)} %`}. Usage : /wallpaper glass 0 à 100 (0 = panneaux transparents, y compris le bandeau de la bestiole), ou /wallpaper glass default.`,
+        }
+      }
+      const t = await current($)
+      if (t !== undefined) await apply($, t)
+      return {
+        text:
+          second === 'default'
+            ? 'Verre des panneaux : retour au réglage de chaque fond.'
+            : `Verre des panneaux à ${second} % d'opacité, bandeau de la bestiole compris. Le texte reste-t-il lisible ? Sinon, remontez la valeur.`,
       }
     }
     if (first === 'pet') {

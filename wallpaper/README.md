@@ -40,6 +40,7 @@ To try it from a clone without installing: `claude --plugin-dir ./wallpaper`.
 | `/wallpaper pet on` / `off` | The little Claude creature above the prompt (desktop and mobile). It blinks, looks around, takes a short walk, hops and waves now and then; bounces under a twinkling star while Claude works; hops with sparkles when a turn ends. |
 | `/wallpaper sound on` / `off` | End-of-turn sound (a bubble). It only plays where Claude Code runs on a Mac (the engine plays it with `afplay`). |
 | `/wallpaper motion on` / `auto` | `auto` (default): the aquarium freezes on a still frame when the system asks for reduced motion (on Windows: Settings > Accessibility > Visual effects > Animation effects off). `on`: it keeps moving anyway. |
+| `/wallpaper glass 0`…`100` / `default` | How opaque the frosted glass is that the desktop app lays on its panels over the scene, the band of the creature above the prompt included: `0` lets the scene show through, `default` goes back to each wallpaper's own (60 % for most). |
 | `/wallpaper diag`, `/wallpaper test` | Display diagnostics: is the theme drawn? does a loud still gradient show? |
 
 What the theme changes:

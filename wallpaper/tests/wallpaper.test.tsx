@@ -157,3 +157,34 @@ test('the autumn night and its thumbnail hold no backslash', () => {
     expect(`${name}: ${SCENES[name].includes('\\')}`).toBe(`${name}: false`)
   }
 })
+
+test('/wallpaper glass lowers the opacity of the glass over the scene, and default restores it', async ($, on) => {
+  const stored: Record<string, unknown> = { scene: 'autumn' }
+  on('store.get', (_, e) => ({ value: stored[(e as { key: string }).key] }))
+  on('store.set', (_, e) => {
+    const { key, value } = e as { key: string; value: unknown }
+    stored[key] = value
+    return { value: undefined }
+  })
+  on('store.delete', (_, e) => {
+    delete stored[(e as { key: string }).key]
+    return { value: undefined }
+  })
+  const glasses: unknown[] = []
+  on('theme.set', (_, e) => {
+    glasses.push((e as { backdrop?: { glass?: unknown } }).backdrop?.glass)
+    return { value: { isDrawn: true, requestId: 't' } }
+  })
+  on('command.run', () => ({}))
+  const run = (args: string) =>
+    $.command.run({ command: 'wallpaper', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 100 } })
+
+  await run('glass 20')
+  expect(stored['glass']).toBe(0.2)
+  expect((glasses.at(-1) as { opacity: number }).opacity).toBe(0.2)
+  await run('glass default')
+  expect(stored['glass']).toBeUndefined()
+  expect((glasses.at(-1) as { opacity: number }).opacity).toBe(0.6)
+  await run('glass 250')
+  expect(glasses.length).toBe(2)
+})
